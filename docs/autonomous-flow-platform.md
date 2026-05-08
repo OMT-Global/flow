@@ -136,10 +136,17 @@ Use GitHub to enforce:
 - required checks;
 - no self-approval where possible;
 - linear history or squash policy;
-- auto-merge enabled by default for clean approved PRs;
+- PR author enables auto-merge by default where GitHub allows it;
 - merge queue if repo churn is high enough to keep PRs constantly behind.
 
 For Axiom specifically, a GitHub merge queue may be worth testing if `BEHIND` churn keeps destroying flow.
+
+Author-owned auto-merge contract:
+- The PR author is responsible for enabling auto-merge as soon as the PR exists and the repo permits it.
+- Standard command: `gh pr merge <number-or-url> --auto --squash` after the PR body is complete and the branch has been pushed.
+- If GitHub refuses auto-merge because the repo/plan/ruleset does not allow it, the author records the exact reason in `## Merge Automation`.
+- If auto-merge is unsafe because the PR is human-gated, release-sensitive, or intentionally paused, the author records that reason and Pheidon owns the explicit merge decision.
+- A healthy PR with no `autoMergeRequest` and no recorded exception is flow drift; route it back to the author/owning lane for metadata repair, not to John.
 
 ## The flow state machine
 
@@ -153,7 +160,7 @@ Controller loop:
 5. Dispatch worker if autonomous.
 6. Validate worker output.
 7. Update GitHub-visible state.
-8. Approve/arm auto-merge when gates are met.
+8. Verify the PR author armed auto-merge where possible; otherwise record the unavailable/unsafe reason and route fallback merge approval.
 9. Close loop and advance next item.
 
 Key principle: every item must have either:

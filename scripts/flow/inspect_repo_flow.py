@@ -154,6 +154,24 @@ def owner_from_author(pr: dict[str, Any]) -> str:
     return LANE_BY_AUTHOR.get(login, 'Pheidon')
 
 
+def repair_actor_for_pr(owner_lane: str, checks: dict[str, Any], merge_state: str) -> tuple[str, str]:
+    failing = {str(name).lower() for name in checks.get('failing') or []}
+    metadata_markers = (
+        'validate pr description',
+        'ci gate',
+        'validate secrets',
+        'detect relevant changes',
+        'attest',
+    )
+    if merge_state in ('BEHIND', 'DIRTY'):
+        return 'Hephaestus', f'Restore mergeability from {merge_state.lower()} state, rerun required checks, and push with --force-with-lease when rebasing.'
+    if any(any(marker in name for marker in metadata_markers) for name in failing):
+        return 'Hephaestus', 'Repair PR metadata, generated governance surfaces, or CI gate wiring, then rerun required checks.'
+    if owner_lane in ('Pheidon', 'Apollo'):
+        return 'Daedalus', 'Reproduce failing checks, make the minimal substantive repair, validate, and push.'
+    return owner_lane, 'Reproduce failing checks, make the minimal repair, validate, and push.'
+
+
 def classify_pr(pr: dict[str, Any]) -> dict[str, Any]:
     checks = check_summary(pr.get('statusCheckRollup') or [])
     labels = label_names(pr)
@@ -173,11 +191,12 @@ def classify_pr(pr: dict[str, Any]) -> dict[str, Any]:
         if pr.get('autoMergeRequest'):
             state = 'Auto-merge Armed'
             next_action = 'Wait for GitHub auto-merge or merge queue completion.'
+            reasons.append('clean_approved_green')
         else:
-            state = 'Ready for Approval'
-            next_actor = 'Pheidon'
-            next_action = 'Arm auto-merge after final gate check.'
-        reasons.append('clean_approved_green')
+            state = 'Needs Repair'
+            next_actor = owner_lane
+            next_action = 'PR author should enable auto-merge where GitHub allows it, or record the unavailable/unsafe reason under Merge Automation.'
+            reasons.extend(['clean_approved_green', 'auto_merge_missing'])
     elif changes or review == 'CHANGES_REQUESTED':
         state = 'Needs Repair'
         next_actor = owner_lane if owner_lane not in ('Pheidon', 'Apollo') else 'Daedalus'
@@ -185,13 +204,13 @@ def classify_pr(pr: dict[str, Any]) -> dict[str, Any]:
         reasons.append('changes_requested')
     elif merge_state in ('DIRTY', 'BEHIND'):
         state = 'Needs Repair'
-        next_actor = 'Hephaestus' if not checks['failing'] else owner_lane
-        next_action = f'Restore mergeability from {merge_state.lower()} state, validate, and push.'
+        next_actor, next_action = repair_actor_for_pr(owner_lane, checks, merge_state)
         reasons.append(f'merge_state:{merge_state.lower()}')
+        if checks['failing']:
+            reasons.append('failing_checks')
     elif checks['failing']:
         state = 'Needs Repair'
-        next_actor = 'Ares' if review == 'APPROVED' else owner_lane
-        next_action = 'Reproduce failing checks, identify owner, repair or dispatch substantive fix.'
+        next_actor, next_action = repair_actor_for_pr(owner_lane, checks, merge_state)
         reasons.append('failing_checks')
     elif review == 'REVIEW_REQUIRED':
         state = 'Needs Review'

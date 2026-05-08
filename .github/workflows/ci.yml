@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  ci-gate:
+    name: CI Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate JSON schemas
+        run: python -m json.tool schemas/issue-contract.schema.json >/dev/null && python -m json.tool schemas/pr-contract.schema.json >/dev/null
+
+      - name: Compile flow inspector
+        run: python -m py_compile scripts/flow/inspect_repo_flow.py

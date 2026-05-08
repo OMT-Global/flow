@@ -1,7 +1,8 @@
 name: Flow blocker
-about: Record a blocked unit of work with a next actor and unblock target.
+description: Record a blocked unit of work with a next actor and unblock target
 title: "Flow blocker: "
-labels: ["state:blocked-infra"]
+labels:
+  - state:blocked-infra
 body:
   - type: textarea
     id: blocked_item
@@ -33,7 +34,14 @@ body:
     id: next_actor
     attributes:
       label: Next actor
-      options: [Pheidon, Apollo, Ares, Daedalus, Hephaestus, Hermes, Human]
+      options:
+        - Pheidon
+        - Apollo
+        - Ares
+        - Daedalus
+        - Hephaestus
+        - Hermes
+        - Human
     validations:
       required: true
   - type: textarea

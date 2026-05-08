@@ -1,13 +1,72 @@
 # OMT-Global Flow
 
-Org-level flow operating system for OMT-Global autonomous work.
+Org-level autonomous flow protocol for OMT-Global issues, PRs, worker lanes, and merge gates.
 
-This repo defines the protocol that keeps issues and PRs moving:
+Use `project.bootstrap.yaml` as the control plane for repo-local scaffolding, GitHub governance, CI policy, and portable Codex profile sync. Plan first, then apply repo, GitHub, and home targets deliberately.
 
-- GitHub issues are durable work contracts.
-- Pull requests are product-building units.
-- Pheidon is the controller and merge gate.
-- Apollo, Ares, Hephaestus, Hermes, and Daedalus are worker lanes with explicit contracts.
-- `OMT-Global/bootstrap` projects these policies into individual repositories.
+## What The Bootstrap Owns
 
-The purpose is not to add more agents. The purpose is to make flow explicit: every unit of work should have truthful state, a valid next action, an accountable actor, and a safe gate to completion.
+- GitHub governance, issue labels, environments, and optional org defaults
+
+- Repo-local `AGENTS.md`, `CONTRIBUTING.md`, and pull request template guidance
+- Fast PR checks plus heavier extended validation lanes
+- SemVer release automation with floating major/minor compatibility tags
+
+- Portable Codex home profile sync
+- Operator docs for onboarding, hosted agents, and follow-up setup
+
+## Quickstart
+
+```sh
+bootstrap plan --manifest ./project.bootstrap.yaml
+bootstrap apply repo --manifest ./project.bootstrap.yaml
+bootstrap apply github --manifest ./project.bootstrap.yaml
+bootstrap apply home --manifest ./project.bootstrap.yaml
+bootstrap doctor --manifest ./project.bootstrap.yaml
+```
+
+Daily fleet reconciliation should start in plan mode and write a report:
+
+```sh
+bootstrap reconcile --workspace-root ~/src --report bootstrap-reconcile.json
+```
+
+To discover GitHub repos first, add `--org OMT-Global`; repositories without local bootstrapped checkouts are skipped in the report.
+
+Once the repo allowlist is trusted, run repo file drift through draft PRs:
+
+```sh
+bootstrap reconcile --workspace-root ~/src --apply-repo --create-pr --report bootstrap-reconcile.json
+```
+
+ It also syncs `github.issueLabels` for issue routing, risk, status, and review gates.
+
+Confirm branch protection points at the `CI Gate` status and require approval from someone other than the most recent pusher. When GitHub plan limits make auto-merge unavailable for a private repo, use the fallback merge-readiness policy: required checks pass or are intentionally skipped, approvals and conversation resolution are satisfied, no blocking review state remains, and a maintainer performs the merge manually.
+
+## Contributor And PR Guidance
+
+- `CONTRIBUTING.md` is the canonical contributor onboarding and local validation surface.
+- `.github/PULL_REQUEST_TEMPLATE.md` is the canonical pull request format for summaries, governing issue links, validation notes, and merge-readiness checks.
+- Existing bootstrapped repos can retrofit these surfaces with `bootstrap apply repo --manifest ./project.bootstrap.yaml`; repos with restricted `repo.managedPaths` should include both paths before applying.
+
+## Project Identity
+
+- Product name: `OMT-Global Flow`
+- Repository: `OMT-Global/flow`
+- Manifest: `project.bootstrap.yaml`
+- Visibility: `public`
+- Default branch: `main`
+- Archetype: `generic-empty`
+
+
+## Release Standard
+
+This bootstrap uses immutable exact SemVer tags such as `v1.2.3`, then automatically advances the floating compatibility tags `v1.2` and `v1` to the same commit.
+
+Cut patch releases from `release/X.Y` branches when you maintain an older minor line. Cut new minor and major releases from `main`.
+
+
+
+## Repository URL
+
+- https://github.com/OMT-Global/flow

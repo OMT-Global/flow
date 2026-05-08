@@ -1,4 +1,4 @@
-version: 2
+version: 1
 project:
   name: flow
   displayName: OMT-Global Flow
@@ -7,26 +7,18 @@ project:
   owner: OMT-Global
   defaultBranch: main
 repo:
-  class: docs-only
-  docs:
-    readme: true
-    contributing: false
-    security: false
-  templates:
-    pullRequest: flow
-    issueTemplates:
-      - implementation
-      - flow-blocker
-  env:
-    exampleFile: false
-    strategy: none
-  hooks:
-    preCommit: standard
-    prePush: standard
+  managedPaths:
+    - AGENTS.md
+    - CONTRIBUTING.md
+    - README.md
+    - .github/PULL_REQUEST_TEMPLATE.md
+    - .github/ISSUE_TEMPLATE/implementation.yml
+    - .github/ISSUE_TEMPLATE/flow_blocker.yml
 archetype:
   kind: generic-empty
 github:
   createRepo: true
+  flowGovernance: true
   autoMerge: true
   deleteBranchOnMerge: true
   requiredApprovals: 1
@@ -38,12 +30,7 @@ github:
     hasWiki: false
     hasDiscussions: true
 ci:
-  policy: standard-public
   runnerPolicy: hybrid-safe
-  workflows:
-    prFastCi: true
-    extendedValidation: false
-    claude: false
 agents:
   sharedSkills:
     - github

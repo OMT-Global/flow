@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/OMT-Global/flow/schemas/issue-contract.schema.json",
+  "title": "OMT-Global Issue Contract",
+  "type": "object",
+  "required": ["problem", "acceptanceCriteria", "validation", "autonomyClass", "recommendedLane"],
+  "properties": {
+    "problem": {"type": "string", "minLength": 1},
+    "acceptanceCriteria": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "validation": {"type": "array", "items": {"type": "string"}},
+    "autonomyClass": {"enum": ["observe", "safe", "review-gated", "human-required", "forbidden-unattended"]},
+    "recommendedLane": {"enum": ["pheidon", "apollo", "ares", "daedalus", "hephaestus", "hermes", "human"]},
+    "dependencies": {"type": "array", "items": {"type": "string"}},
+    "outOfScope": {"type": "array", "items": {"type": "string"}}
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/OMT-Global/flow/schemas/pr-contract.schema.json",
+  "title": "OMT-Global PR Contract",
+  "type": "object",
+  "required": ["summary", "linkedIssue", "ownerLane", "repairOwner", "autonomyClass", "validation"],
+  "properties": {
+    "summary": {"type": "string", "minLength": 1},
+    "linkedIssue": {"type": "string"},
+    "ownerLane": {"enum": ["pheidon", "apollo", "ares", "daedalus", "hephaestus", "hermes", "human"]},
+    "repairOwner": {"enum": ["pheidon", "apollo", "ares", "daedalus", "hephaestus", "hermes", "human"]},
+    "autonomyClass": {"enum": ["observe", "safe", "review-gated", "human-required", "forbidden-unattended"]},
+    "riskClass": {"type": "string"},
+    "validation": {"type": "array", "items": {"type": "string"}}
+  }
+}

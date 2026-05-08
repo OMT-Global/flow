@@ -1,0 +1,50 @@
+version: 2
+project:
+  name: flow
+  displayName: OMT-Global Flow
+  description: Org-level autonomous flow protocol for OMT-Global issues, PRs, worker lanes, and merge gates.
+  visibility: public
+  owner: OMT-Global
+  defaultBranch: main
+repo:
+  class: docs-only
+  docs:
+    readme: true
+    contributing: false
+    security: false
+  templates:
+    pullRequest: flow
+    issueTemplates:
+      - implementation
+      - flow-blocker
+  env:
+    exampleFile: false
+    strategy: none
+  hooks:
+    preCommit: standard
+    prePush: standard
+archetype:
+  kind: generic-empty
+github:
+  createRepo: true
+  autoMerge: true
+  deleteBranchOnMerge: true
+  requiredApprovals: 1
+  requiredStatusChecks:
+    - CI Gate
+  repoFeatures:
+    hasIssues: true
+    hasProjects: true
+    hasWiki: false
+    hasDiscussions: true
+ci:
+  policy: standard-public
+  runnerPolicy: hybrid-safe
+  workflows:
+    prFastCi: true
+    extendedValidation: false
+    claude: false
+agents:
+  sharedSkills:
+    - github
+    - gh-issues

@@ -1,0 +1,57 @@
+# Org-level GitHub Project v2 field spec for OMT-Global flow.
+# Bootstrap can validate repo adoption; a separate org-project provisioner should create/update this.
+
+project:
+  name: OMT-Global Flow
+  owner: OMT-Global
+  purpose: Visible control plane for issue/PR flow across OMT-Global repos.
+fields:
+  - name: Flow State
+    type: single_select
+    options:
+      - Intake
+      - Ready for Planning
+      - Ready for Implementation
+      - Implementing
+      - PR Open
+      - Needs Review
+      - Needs Repair
+      - Repairing
+      - Ready for Approval
+      - Approved / Waiting Checks
+      - Auto-merge Armed
+      - Merged
+      - Blocked - Human
+      - Blocked - Infrastructure
+      - Blocked - Scope
+      - Paused
+  - name: Owner Lane
+    type: single_select
+    options: [Pheidon, Apollo, Ares, Daedalus, Hephaestus, Hermes, Human]
+  - name: Current Actor
+    type: text
+  - name: Next Action
+    type: text
+  - name: Blocked Reason
+    type: text
+  - name: Priority
+    type: single_select
+    options: [P0, P1, P2, P3]
+  - name: WIP Slot
+    type: number
+  - name: Last Progress At
+    type: date
+  - name: Stale Since
+    type: date
+  - name: PR Link
+    type: text
+  - name: Merge Train Group
+    type: text
+  - name: Autonomy Class
+    type: single_select
+    options:
+      - Class 0 - Observe
+      - Class 1 - Safe Autonomous
+      - Class 2 - Review-Gated Autonomous
+      - Class 3 - Human Required
+      - Class 4 - Forbidden Unattended

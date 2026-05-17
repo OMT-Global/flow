@@ -2,6 +2,8 @@
 
 Org-level autonomous flow protocol for OMT-Global issues, PRs, worker lanes, and merge gates.
 
+For the high-level relationship between `flow`, `bootstrap`, `.github`, individual repos, Pheidon, and worker lanes, see [OMT-Global Operating Map](docs/omt-global-operating-map.md).
+
 Use `project.bootstrap.yaml` as the control plane for repo-local scaffolding, GitHub governance, CI policy, and portable Codex profile sync. Plan first, then apply repo, GitHub, and home targets deliberately.
 
 ## What The Bootstrap Owns

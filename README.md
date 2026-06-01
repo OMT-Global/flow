@@ -4,52 +4,66 @@ Org-level autonomous flow protocol for OMT-Global issues, PRs, worker lanes, and
 
 For the high-level relationship between `flow`, `bootstrap`, `.github`, individual repos, Pheidon, and worker lanes, see [OMT-Global Operating Map](docs/omt-global-operating-map.md).
 
-Use `project.bootstrap.yaml` as the control plane for repo-local scaffolding, GitHub governance, CI policy, and portable Codex profile sync. Plan first, then apply repo, GitHub, and home targets deliberately.
+## What Flow Defines
 
-## What The Bootstrap Owns
+- A GitHub-visible state machine for issues, pull requests, checks, reviews, labels, and merge readiness.
+- Worker lane contracts for Pheidon, Apollo, Daedalus, Ares, Hephaestus, and Hermes.
+- Autonomy classes that decide when a worker may observe, patch, repair, or must escalate.
+- PR-first queue policy so open review, repair, mergeability, and CI work outrank starting new issues.
+- Merge-gate rules for linked issues, validation evidence, approvals, requested changes, checks, and auto-merge.
+- Baseline schemas, issue forms, labels, project fields, dashboards, and policy docs that `bootstrap` can project into product repos.
 
-- GitHub governance, issue labels, environments, and optional org defaults
+## Repository Map
 
-- Repo-local `AGENTS.md`, `CONTRIBUTING.md`, and pull request template guidance
-- Fast PR checks plus heavier extended validation lanes
-- SemVer release automation with floating major/minor compatibility tags
+- [`FLOW.md`](FLOW.md) - concise protocol and controller loop.
+- [`agents/`](agents/) - lane contracts for the named worker roles.
+- [`policies/`](policies/) - autonomy, WIP, stall-handling, and merge-gate policy.
+- [`schemas/`](schemas/) - issue and PR contract schemas.
+- [`github/`](github/) - canonical labels, issue templates, project fields, and PR template inputs.
+- [`dashboards/`](dashboards/) - saved query patterns for operational review.
+- [`scripts/flow/inspect_repo_flow.py`](scripts/flow/inspect_repo_flow.py) - local inspector for repo flow metadata.
+- [`docs/autonomous-flow-platform.md`](docs/autonomous-flow-platform.md) - design rationale and rollout plan.
+- [`docs/omt-global-operating-map.md`](docs/omt-global-operating-map.md) - org-level ownership map.
 
-- Portable Codex home profile sync
-- Operator docs for onboarding, hosted agents, and follow-up setup
+## Controller Loop
 
-## Quickstart
+The controller should repeatedly:
+
+1. Inspect live GitHub issues and pull requests.
+2. Normalize each item into one flow state.
+3. Choose one next action and one accountable actor.
+4. Dispatch a worker only when autonomy policy permits.
+5. Validate worker output.
+6. Update GitHub-visible state.
+7. Arm auto-merge or route approval only when gates are satisfied.
+
+## PR-First Queue Policy
+
+Open PR clearance has priority over starting new implementation work:
+
+1. Merge clean approved green PRs.
+2. Refresh or repair dirty, behind, conflicted, or failing PRs.
+3. Resolve requested changes.
+4. Review PRs needing review.
+5. Start new issues only when the PR queue is healthy.
+
+## Validation
 
 ```sh
-bootstrap plan --manifest ./project.bootstrap.yaml
-bootstrap apply repo --manifest ./project.bootstrap.yaml
-bootstrap apply github --manifest ./project.bootstrap.yaml
-bootstrap apply home --manifest ./project.bootstrap.yaml
-bootstrap doctor --manifest ./project.bootstrap.yaml
+python -m json.tool schemas/issue-contract.schema.json >/dev/null
+python -m json.tool schemas/pr-contract.schema.json >/dev/null
+python -m py_compile scripts/flow/inspect_repo_flow.py
 ```
 
-Daily fleet reconciliation should start in plan mode and write a report:
+Run the repo CI gate before opening a PR:
 
 ```sh
-bootstrap reconcile --workspace-root ~/src --report bootstrap-reconcile.json
+bash scripts/ci/run-fast-checks.sh
 ```
 
-To discover GitHub repos first, add `--org OMT-Global`; repositories without local bootstrapped checkouts are skipped in the report.
+## Bootstrap Relationship
 
-Once the repo allowlist is trusted, run repo file drift through draft PRs:
-
-```sh
-bootstrap reconcile --workspace-root ~/src --apply-repo --create-pr --report bootstrap-reconcile.json
-```
-
- It also syncs `github.issueLabels` for issue routing, risk, status, and review gates.
-
-Confirm branch protection points at the `CI Gate` status and require approval from someone other than the most recent pusher. When GitHub plan limits make auto-merge unavailable for a private repo, use the fallback merge-readiness policy: required checks pass or are intentionally skipped, approvals and conversation resolution are satisfied, no blocking review state remains, and a maintainer performs the merge manually.
-
-## Contributor And PR Guidance
-
-- `CONTRIBUTING.md` is the canonical contributor onboarding and local validation surface.
-- `.github/PULL_REQUEST_TEMPLATE.md` is the canonical pull request format for summaries, governing issue links, validation notes, and merge-readiness checks.
-- Existing bootstrapped repos can retrofit these surfaces with `bootstrap apply repo --manifest ./project.bootstrap.yaml`; repos with restricted `repo.managedPaths` should include both paths before applying.
+`flow` defines the operating protocol. `bootstrap` projects the relevant repo-local pieces into OMT-Global repositories through `project.bootstrap.yaml`, managed templates, labels, workflows, and GitHub policy. Update policy here first, then let bootstrap reconcile downstream repos deliberately.
 
 ## Project Identity
 
@@ -59,16 +73,3 @@ Confirm branch protection points at the `CI Gate` status and require approval fr
 - Visibility: `public`
 - Default branch: `main`
 - Archetype: `generic-empty`
-
-
-## Release Standard
-
-This bootstrap uses immutable exact SemVer tags such as `v1.2.3`, then automatically advances the floating compatibility tags `v1.2` and `v1` to the same commit.
-
-Cut patch releases from `release/X.Y` branches when you maintain an older minor line. Cut new minor and major releases from `main`.
-
-
-
-## Repository URL
-
-- https://github.com/OMT-Global/flow

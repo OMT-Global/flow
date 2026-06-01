@@ -12,7 +12,11 @@ permissions:
 jobs:
   ci-gate:
     name: CI Gate
-    runs-on: ubuntu-latest
+    runs-on:
+      - self-hosted
+      - linux
+      - shell-only
+      - public
     steps:
       - name: Checkout
         uses: actions/checkout@v4

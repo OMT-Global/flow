@@ -48,6 +48,21 @@ Canonical states:
 15. `Blocked - Scope`
 16. `Paused`
 
+### Release states
+
+Release work uses the same GitHub-visible control plane, with the detailed release state machine defined in `docs/release-flow.md`.
+
+Canonical release states include `Release Intake`, `Release Scope Locked`, `Release Branch Open`, `Release Prep`, `Preflight Running`, `Preflight Passed`, `Full Validation Running`, `Full Validation Passed`, `Tag Ready`, `Publish Approval Required`, `Publishing`, `Published`, `Postpublish Verification`, `Promoted`, `Release Closed`, the release-specific blocked states, and `Release Rolled Back / Superseded`.
+
+Release actor responsibilities:
+
+- Pheidon: release controller, approval gate, final publish decision.
+- Apollo: release issue quality, scope lock, release notes, changelog quality.
+- Daedalus: release fixes, version bumps, artifact build repair.
+- Ares: adversarial validation, regression pressure, security/risk review.
+- Hephaestus: CI, lockfiles, workflow health, artifact generation, evidence, publish mechanics.
+- Hermes: platform-native validation where relevant, especially macOS/native packaging.
+
 ## Controller loop
 
 The controller repeatedly:
@@ -65,6 +80,8 @@ The controller repeatedly:
 ## PR-first rule
 
 Open PR clearance has priority over starting new implementation work.
+
+During release freeze, PR-first still applies, but release-blocking PRs take priority over net-new feature work.
 
 Priority order:
 
@@ -92,3 +109,5 @@ A unit of work is done only when:
 - the linked issue is closed or intentionally reclassified;
 - flow state is updated;
 - no worker lane retains stale active state for it.
+
+A release is done only when the release issue is closed or intentionally superseded, the release branch is merged or intentionally retained, the exact tag and GitHub Release or prerelease exist, release evidence is uploaded, preflight and validation run IDs are recorded, publish and postpublish evidence are recorded when applicable, channels are promoted when applicable, and no worker lane retains stale active state.

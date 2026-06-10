@@ -73,3 +73,13 @@ bash scripts/ci/run-fast-checks.sh
 - Visibility: `public`
 - Default branch: `main`
 - Archetype: `generic-empty`
+
+## Release Standard
+
+This repository uses release maturity level `simple`. Level 1 `simple` keeps immutable exact SemVer tags such as `v1.2.3`, then automatically advances the floating compatibility tags `v1.2` and `v1` to the same commit. Level 2 `governed` adds preflight, full validation, explicit publish approval, postpublish verification, and release evidence.
+
+Cut patch releases from `release/X.Y` branches when you maintain an older minor line. Cut new minor and major releases from `main`.
+
+## Repository URL
+
+- https://github.com/OMT-Global/flow

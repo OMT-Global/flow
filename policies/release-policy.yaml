@@ -1,0 +1,32 @@
+version: 1
+release:
+  defaultVersioning: semver
+  defaultMaturity: simple
+  releaseBranchPattern: release/{major}.{minor}
+  lanes:
+    dev:
+      ref: main
+    rc:
+      tagPatterns:
+        - v*.*.*-rc.*
+        - v*.*.*-beta.*
+    stable:
+      tagPatterns:
+        - v*.*.*
+    maintenance:
+      branchPattern: release/{major}.{minor}
+  requiredEvidence:
+    - release_issue
+    - target_sha
+    - preflight_run_id
+    - validation_run_id
+    - release_notes
+    - artifact_checksums
+    - postpublish_status
+  actors:
+    controller: Pheidon
+    scope: Apollo
+    implementation: Daedalus
+    validation: Ares
+    ci_artifacts: Hephaestus
+    platform_native: Hermes

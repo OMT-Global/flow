@@ -22,6 +22,16 @@ flowchart TD
     Repo -->|state changes feed the next loop| Flow
 ```
 
+Release train path:
+
+```text
+Flow policy
+  -> Bootstrap projection
+  -> Repo release issue/workflows
+  -> Pheidon approval
+  -> Published release + evidence
+```
+
 ## Mental Model
 
 - `OMT-Global/flow` is the operating protocol for the organization. It defines how work moves through issues, PRs, reviews, repairs, checks, merge gates, and worker lanes.

@@ -1,5 +1,5 @@
 name: Release Train
-about: Governed release train for an OMT-Global repository
+description: Governed release train for an OMT-Global repository
 title: "Release: vX.Y.Z"
 labels:
   - release:train

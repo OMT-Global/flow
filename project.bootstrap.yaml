@@ -14,6 +14,7 @@ repo:
     - .github/PULL_REQUEST_TEMPLATE.md
     - .github/ISSUE_TEMPLATE/implementation.yml
     - .github/ISSUE_TEMPLATE/flow_blocker.yml
+    - .github/ISSUE_TEMPLATE/release_train.yml
 archetype:
   kind: generic-empty
 github:

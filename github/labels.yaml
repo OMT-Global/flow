@@ -98,6 +98,43 @@
   color: "bc80bd"
   description: Policy, flow, bootstrap, or governance work.
 
+- name: release:train
+  color: "5319e7"
+  description: Release train tracking issue.
+- name: release:scope-locked
+  color: "0052cc"
+  description: Release scope is locked except release fixes.
+- name: release:preflight
+  color: "1d76db"
+  description: Release preflight is running or required.
+- name: release:validation
+  color: "fbca04"
+  description: Full release validation is running or required.
+- name: release:publish-ready
+  color: "0e8a16"
+  description: Release has required evidence and is ready for approval.
+- name: release:blocked
+  color: "b60205"
+  description: Release is blocked.
+- name: release:published
+  color: "0e8a16"
+  description: Release has been published.
+- name: release:superseded
+  color: "cfd3d7"
+  description: Release was superseded by a later candidate or release.
+- name: channel:rc
+  color: "c5def5"
+  description: Release candidate or beta channel.
+- name: channel:stable
+  color: "0e8a16"
+  description: Stable release channel.
+- name: channel:maintenance
+  color: "fbca04"
+  description: Maintenance release channel.
+- name: review:release
+  color: "f9d0c4"
+  description: Needs release-owner review.
+
 - name: priority:p0
   color: "e41a1c"
   description: Critical/urgent.

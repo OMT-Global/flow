@@ -1,0 +1,111 @@
+from __future__ import annotations
+
+import base64
+import hashlib
+import importlib.util
+import json
+import unittest
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+POLICY_PATH = ROOT / "policies" / "security-provenance-v1.json"
+MANIFEST_SCHEMA_PATH = ROOT / "schemas" / "provenance-manifest-v1.schema.json"
+VALIDATOR_PATH = ROOT / "scripts" / "flow" / "validate_provenance.py"
+
+
+def load_validator():
+    spec = importlib.util.spec_from_file_location("validate_provenance", VALIDATOR_PATH)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Unable to load validator: {VALIDATOR_PATH}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def manifest(private_bundle: bytes = b"encrypted-private-bundle") -> dict:
+    return {
+        "schemaVersion": "1.0.0",
+        "runId": "run:01JTEST",
+        "repository": "example/repository",
+        "issue": "issue:11",
+        "pullRequest": "pr:18",
+        "agent": {"id": "agent:author", "model": "model-name", "version": "model-version"},
+        "tools": [{"name": "git", "version": "2.50"}],
+        "redactedPrompt": "Implement <secret:api-token:removed>",
+        "promptHash": "a" * 64,
+        "inputArtifactHashes": {"input.txt": "b" * 64},
+        "outputArtifactHashes": {"output.txt": "c" * 64},
+        "commitHash": "d" * 40,
+        "testResults": [{"name": "unit", "status": "passed", "evidence": "run:123"}],
+        "workflowReferences": ["run:123"],
+        "reviewerLineage": [{"agentId": "agent:reviewer", "state": "approved", "evidence": "pr:18#review"}],
+        "privateBundleHash": hashlib.sha256(private_bundle).hexdigest(),
+        "signature": {
+            "algorithm": "sigstore-dsse",
+            "payloadDigest": "e" * 64,
+            "value": base64.b64encode(b"signed-envelope").decode(),
+            "certificateIdentity": "https://github.com/example/workflow",
+            "transparencyLogEntry": "https://rekor.example/entry/1",
+        },
+    }
+
+
+class SecurityProvenancePolicyTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.policy = json.loads(POLICY_PATH.read_text())
+        cls.schema = json.loads(MANIFEST_SCHEMA_PATH.read_text())
+        cls.validator = load_validator()
+
+    def test_policy_has_exact_response_clocks_and_security_controls(self) -> None:
+        standard = json.loads((ROOT / "policies" / "public-repository-standard-v1.json").read_text())
+        self.assertEqual(self.validator.validate_policy(self.policy, standard), [])
+
+    def test_valid_manifest_binds_private_bundle_and_independent_reviewer(self) -> None:
+        bundle = b"encrypted-private-bundle"
+        self.assertEqual(self.validator.validate_manifest(self.policy, self.schema, manifest(bundle), bundle), [])
+
+    def test_missing_required_field_fails(self) -> None:
+        value = manifest(); del value["promptHash"]
+        self.assertIn("$.promptHash: required property is missing", self.validator.validate_manifest(self.policy, self.schema, value, b"encrypted-private-bundle"))
+
+    def test_literal_secret_patterns_fail_public_and_private_content(self) -> None:
+        value = manifest(); value["redactedPrompt"] = "Authorization: Bearer ghp_abcdefghijklmnopqrstuvwxyz123456"
+        errors = self.validator.validate_manifest(self.policy, self.schema, value, b"encrypted-private-bundle")
+        self.assertIn("PRS-PROV-SECRET-001", " ".join(errors))
+        self.assertEqual(
+            self.validator.validate_private_content(self.policy, "password=hunter2"),
+            ["PRS-PROV-SECRET-001: literal secret-like content detected; replace it with a typed placeholder"],
+        )
+
+    def test_typed_secret_placeholders_are_allowed(self) -> None:
+        self.assertEqual(
+            self.validator.validate_private_content(self.policy, "token=<secret:api-token:removed>"),
+            [],
+        )
+
+    def test_private_bundle_digest_mismatch_fails(self) -> None:
+        errors = self.validator.validate_manifest(self.policy, self.schema, manifest(), b"different")
+        self.assertIn("PRS-PROV-DIGEST-001", " ".join(errors))
+
+    def test_author_cannot_satisfy_reviewer_lineage(self) -> None:
+        value = manifest(); value["reviewerLineage"][0]["agentId"] = "agent:author"
+        errors = self.validator.validate_manifest(self.policy, self.schema, value, b"encrypted-private-bundle")
+        self.assertIn("PRS-PROV-LINEAGE-001", " ".join(errors))
+
+    def test_invalid_signature_envelope_fails(self) -> None:
+        value = manifest(); value["signature"]["value"] = "not base64!"
+        errors = self.validator.validate_manifest(self.policy, self.schema, value, b"encrypted-private-bundle")
+        self.assertIn("PRS-PROV-SIGNATURE-001", " ".join(errors))
+
+    def test_required_capture_failure_blocks_material_merge(self) -> None:
+        result = self.validator.evaluate_capture(
+            self.policy, material=True, provenance_required=True, capture_succeeded=False, manifest_valid=False
+        )
+        self.assertEqual(result, {"allowed": False, "ruleId": "PRS-PROV-001", "remediation": "Restore required provenance capture and validate the signed public manifest before merge."})
+        self.assertTrue(self.validator.evaluate_capture(self.policy, material=False, provenance_required=False, capture_succeeded=False, manifest_valid=False)["allowed"])
+
+
+if __name__ == "__main__":
+    unittest.main()

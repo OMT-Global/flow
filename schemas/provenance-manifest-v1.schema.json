@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/OMT-Global/flow/schemas/provenance-manifest-v1.schema.json",
+  "title": "Public provenance manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "runId", "repository", "issue", "pullRequest", "agent", "tools", "redactedPrompt", "promptHash", "inputArtifactHashes", "outputArtifactHashes", "commitHash", "testResults", "workflowReferences", "reviewerLineage", "privateBundleHash", "signature"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "runId": {"type": "string", "pattern": "^run:[^\\s]+$"},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "issue": {"type": "string", "pattern": "^issue:[^\\s]+$"},
+    "pullRequest": {"type": "string", "pattern": "^pr:[^\\s]+$"},
+    "agent": {"$ref": "#/$defs/agent"},
+    "tools": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/tool"}},
+    "redactedPrompt": {"type": "string"},
+    "promptHash": {"$ref": "#/$defs/sha256"},
+    "inputArtifactHashes": {"$ref": "#/$defs/nonEmptyHashMap"},
+    "outputArtifactHashes": {"$ref": "#/$defs/nonEmptyHashMap"},
+    "commitHash": {"type": "string", "pattern": "^[0-9a-f]{40,64}$"},
+    "testResults": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/testResult"}},
+    "workflowReferences": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^run:[^\\s]+$"}},
+    "reviewerLineage": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/reviewer"}},
+    "privateBundleHash": {"$ref": "#/$defs/sha256"},
+    "signature": {"$ref": "#/$defs/dsseEnvelope"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "nonEmptyHashMap": {"type": "object", "minProperties": 1, "additionalProperties": {"$ref": "#/$defs/sha256"}},
+    "agent": {"type": "object", "additionalProperties": false, "required": ["id", "model", "version"], "properties": {"id": {"type": "string", "pattern": "^agent:[a-z0-9][a-z0-9-]*$"}, "model": {"type": "string", "minLength": 1}, "version": {"type": "string", "minLength": 1}}},
+    "tool": {"type": "object", "additionalProperties": false, "required": ["name", "version"], "properties": {"name": {"type": "string", "minLength": 1}, "version": {"type": "string", "minLength": 1}}},
+    "testResult": {"type": "object", "additionalProperties": false, "required": ["name", "status", "evidence"], "properties": {"name": {"type": "string", "minLength": 1}, "status": {"enum": ["passed", "failed", "skipped"]}, "evidence": {"type": "string", "pattern": "^run:[^\\s]+$"}}},
+    "reviewer": {"type": "object", "additionalProperties": false, "required": ["agentId", "state", "evidence", "repository", "pullRequest", "commitHash", "reviewDigest"], "properties": {"agentId": {"type": "string", "pattern": "^agent:[a-z0-9][a-z0-9-]*$"}, "state": {"const": "approved"}, "evidence": {"type": "string", "pattern": "^pr:[^#\\s]+#.+$"}, "repository": {"type": "string", "minLength": 3}, "pullRequest": {"type": "string", "pattern": "^pr:[^\\s]+$"}, "commitHash": {"type": "string", "pattern": "^[0-9a-f]{40,64}$"}, "reviewDigest": {"$ref": "#/$defs/sha256"}}},
+    "dsseSignature": {"type": "object", "additionalProperties": false, "required": ["keyid", "sig"], "properties": {"keyid": {"type": "string", "minLength": 1}, "sig": {"type": "string", "minLength": 8}}},
+    "dsseEnvelope": {"type": "object", "additionalProperties": false, "required": ["payloadType", "payload", "signatures", "certificateIdentity", "certificateIssuer", "transparencyLogEntry"], "properties": {"payloadType": {"const": "application/vnd.omt.provenance-manifest.v1+json"}, "payload": {"type": "string", "minLength": 8}, "signatures": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/dsseSignature"}}, "certificateIdentity": {"type": "string", "pattern": "^https://"}, "certificateIssuer": {"const": "https://token.actions.githubusercontent.com"}, "transparencyLogEntry": {"type": "string", "pattern": "^https://"}}}
+  }
+}

@@ -19,16 +19,19 @@ jobs:
       - public
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Validate JSON schemas
-        run: python -m json.tool schemas/issue-contract.schema.json >/dev/null && python -m json.tool schemas/pr-contract.schema.json >/dev/null && python -m json.tool schemas/public-repository-standard-v1.schema.json >/dev/null
+        run: python -m json.tool schemas/issue-contract.schema.json >/dev/null && python -m json.tool schemas/pr-contract.schema.json >/dev/null && python -m json.tool schemas/public-repository-standard-v1.schema.json >/dev/null && python -m json.tool schemas/provenance-manifest-v1.schema.json >/dev/null
 
       - name: Validate public repository policy bundle
         run: python scripts/flow/validate_policy_bundle.py
 
       - name: Validate executable transition policy
         run: python scripts/flow/validate_transition.py
+
+      - name: Validate security and provenance policy
+        run: python scripts/flow/validate_provenance.py
 
       - name: Test public repository policy bundle
         run: python -m unittest discover -s tests -v

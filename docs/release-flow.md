@@ -47,6 +47,8 @@ Canonical release states:
 19. `Release Blocked - Artifact`
 20. `Release Rolled Back / Superseded`
 
+The executable transition contract is [`policies/transitions-v1.json`](../policies/transitions-v1.json). `Publish Approval Required` is retained as a compatibility state name; it records publish-gate evaluation and material notification. It requires explicit human approval only when the release includes a defined human hard stop or a configured protected-environment gate.
+
 ## Actors
 
 - Pheidon: release controller, approval gate, final publish decision.

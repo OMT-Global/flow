@@ -48,6 +48,8 @@ Canonical states:
 15. `Blocked - Scope`
 16. `Paused`
 
+Allowed transitions, evidence gates, and stable failure rules are defined in [`policies/transitions-v1.json`](policies/transitions-v1.json). Validate the policy or evaluate a proposed transition with `python3 scripts/flow/validate_transition.py`. The checked-in [transition diagram](docs/diagrams/policy-transitions-v1.mmd) is a compact view; the policy JSON is authoritative.
+
 ### Release states
 
 Release work uses the same GitHub-visible control plane, with the detailed release state machine defined in `docs/release-flow.md`.

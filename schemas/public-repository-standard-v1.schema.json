@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/OMT-Global/flow/schemas/public-repository-standard-v1.schema.json",
+  "title": "Public Repository Standard v1 policy bundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "standard",
+    "version",
+    "publisher",
+    "repositoryClasses",
+    "maturityLevels",
+    "materialActions",
+    "notifications",
+    "humanHardStops",
+    "adrTriggers",
+    "quality",
+    "security",
+    "provenance",
+    "release",
+    "exceptions",
+    "conformance",
+    "compatibility",
+    "rules"
+  ],
+  "properties": {
+    "$schema": {"type": "string", "minLength": 1},
+    "standard": {"const": "public-repository-standard"},
+    "version": {"type": "string", "pattern": "^1\\.[0-9]+\\.[0-9]+$"},
+    "publisher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identitySource", "spendThresholdSource"],
+      "properties": {
+        "identitySource": {"const": "publisherKey"},
+        "spendThresholdSource": {"const": "publisher.spendingApprovalThreshold"}
+      }
+    },
+    "repositoryClasses": {
+      "type": "object", "additionalProperties": false,
+      "required": ["cli", "library", "service", "infrastructure", "github-action", "specification", "documentation"],
+      "properties": {
+        "cli": {"type": "string", "minLength": 1},
+        "library": {"type": "string", "minLength": 1},
+        "service": {"type": "string", "minLength": 1},
+        "infrastructure": {"type": "string", "minLength": 1},
+        "github-action": {"type": "string", "minLength": 1},
+        "specification": {"type": "string", "minLength": 1},
+        "documentation": {"type": "string", "minLength": 1}
+      }
+    },
+    "maturityLevels": {
+      "type": "object", "additionalProperties": false,
+      "required": ["experimental", "alpha", "beta", "stable", "maintenance", "archived"],
+      "properties": {
+        "experimental": {"type": "string", "minLength": 1},
+        "alpha": {"type": "string", "minLength": 1},
+        "beta": {"type": "string", "minLength": 1},
+        "stable": {"type": "string", "minLength": 1},
+        "maintenance": {"type": "string", "minLength": 1},
+        "archived": {"type": "string", "minLength": 1}
+      }
+    },
+    "materialActions": {"$ref": "#/$defs/uniqueStrings"},
+    "notifications": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "requiredDestinations", "continueAfterNotification"],
+      "properties": {
+        "mode": {"const": "execute-and-notify"},
+        "requiredDestinations": {"$ref": "#/$defs/uniqueStrings"},
+        "continueAfterNotification": {"const": true}
+      }
+    },
+    "humanHardStops": {
+      "type": "object", "additionalProperties": false,
+      "required": ["categories", "spendThresholdSource"],
+      "properties": {
+        "categories": {"const": ["license-change", "public-ownership-change", "repository-ownership-transfer", "expose-previously-private-data", "irreversible-production-data-destruction", "external-legal-contractual-obligation", "spend-above-configured-threshold", "grant-organization-owner-permission", "grant-billing-permission", "permanent-policy-exception"]},
+        "spendThresholdSource": {"const": "publisher.spendingApprovalThreshold"}
+      }
+    },
+    "adrTriggers": {"$ref": "#/$defs/uniqueStrings"},
+    "quality": {
+      "type": "object", "additionalProperties": false,
+      "required": ["testFirst", "testEverythingWorthImplementing", "strongTypingAtMeaningfulBoundaries", "silentErrorsProhibited", "pullRequestChangedLines", "dcoVersion"],
+      "properties": {
+        "testFirst": {"const": true},
+        "testEverythingWorthImplementing": {"const": true},
+        "strongTypingAtMeaningfulBoundaries": {"const": true},
+        "silentErrorsProhibited": {"const": true},
+        "pullRequestChangedLines": {"$ref": "#/$defs/pullRequestChangedLines"},
+        "dcoVersion": {"const": "1.1"}
+      }
+    },
+    "security": {
+      "type": "object", "additionalProperties": false,
+      "required": ["requiredControls", "responseTargets"],
+      "properties": {
+        "requiredControls": {"const": ["secret-scanning", "dependency-scanning", "code-scanning", "sbom-generation", "provenance-attestation", "immutable-action-references", "private-vulnerability-reporting", "security-contact", "security-response-policy", "fork-safe-workflows"]},
+        "responseTargets": {"$ref": "#/$defs/securityResponseTargets"}
+      }
+    },
+    "provenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["publicManifestRequired", "publicManifestPath", "privateSinkReference", "literalSecretsProhibited", "secretReplacement", "failClosedForRequiredMaterialChanges"],
+      "properties": {
+        "publicManifestRequired": {"const": true},
+        "publicManifestPath": {"const": "provenance/runs"},
+        "privateSinkReference": {"const": "logical-name"},
+        "literalSecretsProhibited": {"const": true},
+        "secretReplacement": {"const": "typed-placeholder"},
+        "failClosedForRequiredMaterialChanges": {"const": true}
+      }
+    },
+    "release": {
+      "type": "object", "additionalProperties": false,
+      "required": ["strategy", "versioning", "conventionalCommits", "immutableExactTags", "automatedChangelogProposal", "agentPublishAfterGates", "postPublicationVerification", "productionPolicyPin", "releaseBranches"],
+      "properties": {
+        "strategy": {"const": "when-ready"},
+        "versioning": {"const": "semver"},
+        "conventionalCommits": {"const": true},
+        "immutableExactTags": {"const": true},
+        "automatedChangelogProposal": {"const": true},
+        "agentPublishAfterGates": {"const": true},
+        "postPublicationVerification": {"const": true},
+        "productionPolicyPin": {"const": "exact-release-or-immutable-sha"},
+        "releaseBranches": {"const": "supported-older-lines-only"}
+      }
+    },
+    "exceptions": {
+      "type": "object", "additionalProperties": false,
+      "required": ["humanApprovalRequired", "requiredFields", "temporaryNormallyExpires", "expiredResult", "permanentRequires"],
+      "properties": {
+        "humanApprovalRequired": {"const": true},
+        "requiredFields": {"$ref": "#/$defs/uniqueStrings"},
+        "temporaryNormallyExpires": {"const": true},
+        "expiredResult": {"const": "blocking"},
+        "permanentRequires": {"$ref": "#/$defs/uniqueStrings"}
+      }
+    },
+    "conformance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["outputFormats", "blockingRuleIds", "blockingExitCode"],
+      "properties": {
+        "outputFormats": {"$ref": "#/$defs/uniqueStrings"},
+        "blockingRuleIds": {"$ref": "#/$defs/uniqueStrings"},
+        "blockingExitCode": {"type": "integer", "minimum": 1}
+      }
+    },
+    "compatibility": {
+      "type": "object", "additionalProperties": false,
+      "required": ["repositoryClassAliases", "legacyTerms"],
+      "properties": {
+        "repositoryClassAliases": {"$ref": "#/$defs/nonEmptyStringMap"},
+        "legacyTerms": {"$ref": "#/$defs/nonEmptyStringMap"}
+      }
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 12,
+      "items": {"$ref": "#/$defs/rule"}
+    }
+  },
+  "$defs": {
+    "stringMap": {
+      "type": "object",
+      "additionalProperties": {"type": "string", "minLength": 1}
+    },
+    "nonEmptyStringMap": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "string", "minLength": 1}
+    },
+    "uniqueStrings": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "securityResponseTargets": {
+      "type": "object", "additionalProperties": false,
+      "required": ["acknowledgePrivateReportBusinessDays", "triageCalendarDays", "criticalRemediateOrContainCalendarDays", "highRemediateCalendarDays"],
+      "properties": {
+        "acknowledgePrivateReportBusinessDays": {"const": 2},
+        "triageCalendarDays": {"const": 7},
+        "criticalRemediateOrContainCalendarDays": {"const": 7},
+        "highRemediateCalendarDays": {"const": 30}
+      }
+    },
+    "pullRequestChangedLines": {
+      "type": "object", "additionalProperties": false,
+      "required": ["targetBelow", "warningAbove", "blockAbove", "excludedKinds"],
+      "properties": {
+        "targetBelow": {"const": 400},
+        "warningAbove": {"const": 800},
+        "blockAbove": {"const": 1500},
+        "excludedKinds": {"const": ["generated", "lockfile", "fixture", "vendored"]}
+      }
+    },
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "area", "severity", "summary"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^PRS-[A-Z]+-[0-9]{3}$"},
+        "area": {
+          "enum": [
+            "repository-classification",
+            "maturity",
+            "material-action",
+            "notification",
+            "human-hard-stop",
+            "adr",
+            "quality",
+            "security",
+            "provenance",
+            "release",
+            "exception",
+            "conformance"
+          ]
+        },
+        "severity": {"enum": ["advisory", "warning", "blocking"]},
+        "summary": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

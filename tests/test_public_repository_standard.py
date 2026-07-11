@@ -85,7 +85,7 @@ class PublicRepositoryStandardTests(unittest.TestCase):
         self.assertEqual(
             self.validator.validate_bundle(invalid, self.schema),
             [
-                "$.conformance.blockingRuleIds[4]: unknown rule id 'PRS-NOT-REAL'",
+                "$.conformance.blockingRuleIds[12]: unknown rule id 'PRS-NOT-REAL'",
             ],
         )
 
@@ -105,6 +105,70 @@ class PublicRepositoryStandardTests(unittest.TestCase):
             [
                 "$.compatibility.repositoryClassAliases.tooling: unknown repository class 'missing'",
             ],
+        )
+
+    def test_unknown_top_level_property_fails_schema_validation(self) -> None:
+        invalid = copy.deepcopy(self.bundle)
+        invalid["unexpected"] = True
+        self.assertEqual(
+            self.validator.validate_bundle(invalid, self.schema),
+            ["$.unexpected: additional property is not allowed"],
+        )
+
+    def test_malformed_nested_policy_fails_schema_validation(self) -> None:
+        invalid = copy.deepcopy(self.bundle)
+        invalid["notifications"] = "garbage"
+        self.assertEqual(
+            self.validator.validate_bundle(invalid, self.schema),
+            ["$.notifications: expected object"],
+        )
+
+    def test_all_blocking_severities_are_listed_for_conformance(self) -> None:
+        invalid = copy.deepcopy(self.bundle)
+        invalid["conformance"]["blockingRuleIds"].remove("PRS-QUALITY-001")
+        self.assertEqual(
+            self.validator.validate_bundle(invalid, self.schema),
+            [
+                "$.conformance.blockingRuleIds: missing blocking rule id 'PRS-QUALITY-001'",
+            ],
+        )
+
+    def test_required_maturity_cannot_be_removed(self) -> None:
+        invalid = copy.deepcopy(self.bundle)
+        del invalid["maturityLevels"]["stable"]
+        self.assertEqual(
+            self.validator.validate_bundle(invalid, self.schema),
+            ["$.maturityLevels.stable: required property is missing"],
+        )
+
+    def test_required_security_control_cannot_be_removed(self) -> None:
+        invalid = copy.deepcopy(self.bundle)
+        invalid["security"]["requiredControls"].remove("code-scanning")
+        self.assertEqual(
+            self.validator.validate_bundle(invalid, self.schema),
+            ["$.security.requiredControls: expected constant policy value"],
+        )
+
+    def test_security_response_target_cannot_be_replaced(self) -> None:
+        invalid = copy.deepcopy(self.bundle)
+        invalid["security"]["responseTargets"] = {"madeUp": 1}
+        self.assertEqual(
+            self.validator.validate_bundle(invalid, self.schema),
+            [
+                "$.security.responseTargets.acknowledgePrivateReportBusinessDays: required property is missing",
+                "$.security.responseTargets.criticalRemediateOrContainCalendarDays: required property is missing",
+                "$.security.responseTargets.highRemediateCalendarDays: required property is missing",
+                "$.security.responseTargets.madeUp: additional property is not allowed",
+                "$.security.responseTargets.triageCalendarDays: required property is missing",
+            ],
+        )
+
+    def test_pull_request_thresholds_cannot_be_weakened(self) -> None:
+        invalid = copy.deepcopy(self.bundle)
+        invalid["quality"]["pullRequestChangedLines"]["blockAbove"] = 9999
+        self.assertEqual(
+            self.validator.validate_bundle(invalid, self.schema),
+            ["$.quality.pullRequestChangedLines.blockAbove: expected constant 1500"],
         )
 
 

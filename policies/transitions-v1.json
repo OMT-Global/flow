@@ -1,0 +1,63 @@
+{
+  "version": "1.0.0",
+  "ruleId": "PRS-TRANSITION-001",
+  "domains": {
+    "work": {
+      "initial": "Intake",
+      "terminal": ["Merged"],
+      "states": {
+        "Intake": ["Ready for Planning", "Blocked - Scope", "Paused"],
+        "Ready for Planning": ["Ready for Implementation", "Blocked - Scope", "Paused"],
+        "Ready for Implementation": ["Implementing", "Blocked - Human", "Paused"],
+        "Implementing": ["PR Open", "Blocked - Human", "Blocked - Infrastructure", "Blocked - Scope", "Paused"],
+        "PR Open": ["Needs Review", "Needs Repair", "Blocked - Infrastructure"],
+        "Needs Review": ["Ready for Approval", "Needs Repair", "Blocked - Human"],
+        "Needs Repair": ["Repairing", "Paused"],
+        "Repairing": ["Needs Review", "Blocked - Human", "Blocked - Infrastructure", "Blocked - Scope", "Paused"],
+        "Ready for Approval": ["Approved / Waiting Checks", "Needs Repair", "Blocked - Human"],
+        "Approved / Waiting Checks": ["Auto-merge Armed", "Needs Repair", "Blocked - Infrastructure"],
+        "Auto-merge Armed": ["Merged", "Needs Repair", "Blocked - Infrastructure"],
+        "Merged": [],
+        "Blocked - Human": ["Ready for Planning", "Ready for Implementation", "Implementing", "Needs Review", "Ready for Approval", "Paused"],
+        "Blocked - Infrastructure": ["Implementing", "PR Open", "Needs Review", "Repairing", "Approved / Waiting Checks", "Auto-merge Armed", "Paused"],
+        "Blocked - Scope": ["Ready for Planning", "Ready for Implementation", "Implementing", "Repairing", "Paused"],
+        "Paused": ["Ready for Planning", "Ready for Implementation", "Implementing", "Repairing"]
+      }
+    },
+    "release": {
+      "initial": "Release Intake",
+      "terminal": ["Release Closed", "Release Rolled Back / Superseded"],
+      "states": {
+        "Release Intake": ["Release Scope Locked", "Release Blocked - Human", "Release Rolled Back / Superseded"],
+        "Release Scope Locked": ["Release Branch Open", "Release Blocked - Human", "Release Rolled Back / Superseded"],
+        "Release Branch Open": ["Release Prep", "Release Blocked - CI", "Release Rolled Back / Superseded"],
+        "Release Prep": ["Preflight Running", "Release Blocked - CI", "Release Blocked - Artifact", "Release Rolled Back / Superseded"],
+        "Preflight Running": ["Preflight Passed", "Release Blocked - CI", "Release Blocked - Security", "Release Blocked - Artifact"],
+        "Preflight Passed": ["Full Validation Running", "Release Blocked - Security", "Release Blocked - Artifact"],
+        "Full Validation Running": ["Full Validation Passed", "Release Blocked - CI", "Release Blocked - Security", "Release Blocked - Artifact"],
+        "Full Validation Passed": ["Tag Ready", "Release Blocked - Security", "Release Blocked - Artifact"],
+        "Tag Ready": ["Publish Approval Required", "Release Blocked - Human", "Release Blocked - Security", "Release Rolled Back / Superseded"],
+        "Publish Approval Required": ["Publishing", "Release Blocked - Human", "Release Blocked - Security", "Release Rolled Back / Superseded"],
+        "Publishing": ["Published", "Release Blocked - CI", "Release Blocked - Security", "Release Blocked - Artifact", "Release Rolled Back / Superseded"],
+        "Published": ["Postpublish Verification", "Release Rolled Back / Superseded"],
+        "Postpublish Verification": ["Promoted", "Release Closed", "Release Blocked - CI", "Release Blocked - Security", "Release Rolled Back / Superseded"],
+        "Promoted": ["Release Closed", "Release Rolled Back / Superseded"],
+        "Release Closed": [],
+        "Release Blocked - Human": ["Release Intake", "Release Scope Locked", "Tag Ready", "Publish Approval Required", "Release Rolled Back / Superseded"],
+        "Release Blocked - CI": ["Release Prep", "Preflight Running", "Full Validation Running", "Publishing", "Postpublish Verification", "Release Rolled Back / Superseded"],
+        "Release Blocked - Security": ["Preflight Running", "Full Validation Running", "Tag Ready", "Publish Approval Required", "Postpublish Verification", "Release Rolled Back / Superseded"],
+        "Release Blocked - Artifact": ["Release Prep", "Preflight Running", "Release Rolled Back / Superseded"],
+        "Release Rolled Back / Superseded": []
+      }
+    }
+  },
+  "evidenceRules": {
+    "material": {"ruleId": "PRS-NOTIFY-001", "requires": "notificationEvidence", "continueAfterEvidence": true},
+    "hardStop": {"ruleId": "PRS-HARDSTOP-001", "requires": "approvalEvidence"},
+    "resumeFrom": {
+      "Release Blocked - Security": {"ruleId": "PRS-SECURITY-001", "requires": "resolutionAndApprovalEvidence"},
+      "Release Blocked - Artifact": {"ruleId": "PRS-PROV-001", "requires": "resolutionEvidence"},
+      "Release Blocked - Human": {"ruleId": "PRS-HARDSTOP-001", "requires": "approvalEvidence"}
+    }
+  }
+}

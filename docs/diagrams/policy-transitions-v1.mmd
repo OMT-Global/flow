@@ -1,0 +1,74 @@
+flowchart LR
+  subgraph work
+    work_Intake["Intake"]
+    work_Ready_for_Planning["Ready for Planning"]
+    work_Ready_for_Implementation["Ready for Implementation"]
+    work_Implementing["Implementing"]
+    work_PR_Open["PR Open"]
+    work_Needs_Review["Needs Review"]
+    work_Needs_Repair["Needs Repair"]
+    work_Repairing["Repairing"]
+    work_Ready_for_Approval["Ready for Approval"]
+    work_Approved___Waiting_Checks["Approved / Waiting Checks"]
+    work_Auto_merge_Armed["Auto-merge Armed"]
+    work_Merged["Merged"]
+    work_Blocked___Human["Blocked - Human"]
+    work_Blocked___Infrastructure["Blocked - Infrastructure"]
+    work_Blocked___Scope["Blocked - Scope"]
+    work_Paused["Paused"]
+    work_Intake --> work_Ready_for_Planning & work_Blocked___Scope & work_Paused
+    work_Ready_for_Planning --> work_Ready_for_Implementation & work_Blocked___Scope & work_Paused
+    work_Ready_for_Implementation --> work_Implementing & work_Blocked___Human & work_Paused
+    work_Implementing --> work_PR_Open & work_Blocked___Human & work_Blocked___Infrastructure & work_Blocked___Scope & work_Paused
+    work_PR_Open --> work_Needs_Review & work_Needs_Repair & work_Blocked___Infrastructure
+    work_Needs_Review --> work_Ready_for_Approval & work_Needs_Repair & work_Blocked___Human
+    work_Needs_Repair --> work_Repairing & work_Paused
+    work_Repairing --> work_Needs_Review & work_Blocked___Human & work_Blocked___Infrastructure & work_Blocked___Scope & work_Paused
+    work_Ready_for_Approval --> work_Approved___Waiting_Checks & work_Needs_Repair & work_Blocked___Human
+    work_Approved___Waiting_Checks --> work_Auto_merge_Armed & work_Needs_Repair & work_Blocked___Infrastructure
+    work_Auto_merge_Armed --> work_Merged & work_Needs_Repair & work_Blocked___Infrastructure
+    work_Blocked___Human --> work_Ready_for_Planning & work_Ready_for_Implementation & work_Implementing & work_Needs_Review & work_Ready_for_Approval & work_Paused
+    work_Blocked___Infrastructure --> work_Implementing & work_PR_Open & work_Needs_Review & work_Repairing & work_Approved___Waiting_Checks & work_Auto_merge_Armed & work_Paused
+    work_Blocked___Scope --> work_Ready_for_Planning & work_Ready_for_Implementation & work_Implementing & work_Repairing & work_Paused
+    work_Paused --> work_Ready_for_Planning & work_Ready_for_Implementation & work_Implementing & work_Repairing
+  end
+  subgraph release
+    release_Release_Intake["Release Intake"]
+    release_Release_Scope_Locked["Release Scope Locked"]
+    release_Release_Branch_Open["Release Branch Open"]
+    release_Release_Prep["Release Prep"]
+    release_Preflight_Running["Preflight Running"]
+    release_Preflight_Passed["Preflight Passed"]
+    release_Full_Validation_Running["Full Validation Running"]
+    release_Full_Validation_Passed["Full Validation Passed"]
+    release_Tag_Ready["Tag Ready"]
+    release_Publish_Approval_Required["Publish Approval Required"]
+    release_Publishing["Publishing"]
+    release_Published["Published"]
+    release_Postpublish_Verification["Postpublish Verification"]
+    release_Promoted["Promoted"]
+    release_Release_Closed["Release Closed"]
+    release_Release_Blocked___Human["Release Blocked - Human"]
+    release_Release_Blocked___CI["Release Blocked - CI"]
+    release_Release_Blocked___Security["Release Blocked - Security"]
+    release_Release_Blocked___Artifact["Release Blocked - Artifact"]
+    release_Release_Rolled_Back___Superseded["Release Rolled Back / Superseded"]
+    release_Release_Intake --> release_Release_Scope_Locked & release_Release_Blocked___Human & release_Release_Rolled_Back___Superseded
+    release_Release_Scope_Locked --> release_Release_Branch_Open & release_Release_Blocked___Human & release_Release_Rolled_Back___Superseded
+    release_Release_Branch_Open --> release_Release_Prep & release_Release_Blocked___CI & release_Release_Rolled_Back___Superseded
+    release_Release_Prep --> release_Preflight_Running & release_Release_Blocked___CI & release_Release_Blocked___Artifact & release_Release_Rolled_Back___Superseded
+    release_Preflight_Running --> release_Preflight_Passed & release_Release_Blocked___CI & release_Release_Blocked___Security & release_Release_Blocked___Artifact
+    release_Preflight_Passed --> release_Full_Validation_Running & release_Release_Blocked___Security & release_Release_Blocked___Artifact
+    release_Full_Validation_Running --> release_Full_Validation_Passed & release_Release_Blocked___CI & release_Release_Blocked___Security & release_Release_Blocked___Artifact
+    release_Full_Validation_Passed --> release_Tag_Ready & release_Release_Blocked___Security & release_Release_Blocked___Artifact
+    release_Tag_Ready --> release_Publish_Approval_Required & release_Release_Blocked___Human & release_Release_Blocked___Security & release_Release_Rolled_Back___Superseded
+    release_Publish_Approval_Required --> release_Publishing & release_Release_Blocked___Human & release_Release_Blocked___Security & release_Release_Rolled_Back___Superseded
+    release_Publishing --> release_Published & release_Release_Blocked___CI & release_Release_Blocked___Security & release_Release_Blocked___Artifact & release_Release_Rolled_Back___Superseded
+    release_Published --> release_Postpublish_Verification & release_Release_Rolled_Back___Superseded
+    release_Postpublish_Verification --> release_Promoted & release_Release_Closed & release_Release_Blocked___CI & release_Release_Blocked___Security & release_Release_Rolled_Back___Superseded
+    release_Promoted --> release_Release_Closed & release_Release_Rolled_Back___Superseded
+    release_Release_Blocked___Human --> release_Release_Intake & release_Release_Scope_Locked & release_Tag_Ready & release_Publish_Approval_Required & release_Release_Rolled_Back___Superseded
+    release_Release_Blocked___CI --> release_Release_Prep & release_Preflight_Running & release_Full_Validation_Running & release_Publishing & release_Postpublish_Verification & release_Release_Rolled_Back___Superseded
+    release_Release_Blocked___Security --> release_Preflight_Running & release_Full_Validation_Running & release_Tag_Ready & release_Publish_Approval_Required & release_Postpublish_Verification & release_Release_Rolled_Back___Superseded
+    release_Release_Blocked___Artifact --> release_Release_Prep & release_Preflight_Running & release_Release_Rolled_Back___Superseded
+  end

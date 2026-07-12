@@ -1,0 +1,9 @@
+flowchart LR
+  A["Agent run"] --> R["Secret filtering and typed redaction"]
+  R --> P["Public manifest"]
+  R --> B["Encrypted private bundle"]
+  B --> D["SHA-256 digest"] --> P
+  V["Independent reviewer lineage"] --> P
+  P --> S["Sigstore DSSE signing"] --> G["Public provenance/runs"]
+  B --> L["Logical private sink"] --> O["S3-compatible immutable storage"]
+  F["Capture or validation failure"] --> M["Block material merge and notify"]

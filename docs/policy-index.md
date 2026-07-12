@@ -9,8 +9,10 @@ Flow publishes the authoritative repository policy vocabulary and work-state sem
 - Architecture decision: [`decisions/ADR-0001-public-repository-standard-v1.md`](decisions/ADR-0001-public-repository-standard-v1.md)
 - Compatibility map: [`public-repository-standard-compatibility.md`](public-repository-standard-compatibility.md)
 - Validator: `python3 scripts/flow/validate_policy_bundle.py`
-- Security and provenance: [`security-provenance-policy.md`](security-provenance-policy.md)
-- Public provenance manifest schema: [`schemas/provenance-manifest-v1.schema.json`](../schemas/provenance-manifest-v1.schema.json)
+      - Security and provenance: [`security-provenance-policy.md`](security-provenance-policy.md)
+      - Public provenance manifest schema: [`schemas/provenance-manifest-v1.schema.json`](../schemas/provenance-manifest-v1.schema.json)
+      - Contribution lifecycle: [`contribution-lifecycle-policy.md`](contribution-lifecycle-policy.md)
+      - Contribution policy data: [`policies/contribution-lifecycle-v1.json`](../policies/contribution-lifecycle-v1.json)
 
 Production consumers must use an exact released version or immutable commit SHA. They must not consume `main` or a floating compatibility tag as production policy.
 

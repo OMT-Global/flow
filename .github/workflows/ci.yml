@@ -33,6 +33,9 @@ jobs:
       - name: Validate security and provenance policy
         run: python scripts/flow/validate_provenance.py
 
+      - name: Validate contribution lifecycle policy
+        run: python scripts/flow/evaluate_contribution.py
+
       - name: Test public repository policy bundle
         run: python -m unittest discover -s tests -v
 

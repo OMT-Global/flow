@@ -1,0 +1,77 @@
+{
+  "version": "1.0.0",
+  "pullRequest": {
+    "changedLines": {
+      "targetBelow": 400,
+      "warningAbove": 800,
+      "blockAbove": 1500,
+      "excludedKinds": ["generated", "lockfile", "fixture", "vendored"]
+    },
+    "exclusionPatterns": {
+      "generated": ["dist/**", "build/**", "**/dist/**", "**/build/**", "**/*.generated.*", "**/generated/**"],
+      "lockfile": ["package-lock.json", "**/package-lock.json", "pnpm-lock.yaml", "**/pnpm-lock.yaml", "yarn.lock", "**/yarn.lock", "Cargo.lock", "**/Cargo.lock", "uv.lock", "**/uv.lock", "Podfile.lock", "**/Podfile.lock"],
+      "fixture": ["fixtures/**", "**/fixtures/**", "testdata/**", "**/testdata/**"],
+      "vendored": ["vendor/**", "**/vendor/**", "third_party/**", "**/third_party/**"]
+    },
+    "materialPathTriggers": {
+      "schemas/**": "public-api-change",
+      "migrations/**": "database-migration",
+      ".github/workflows/**": "repository-settings-change",
+      "package.json": "runtime-dependency-addition",
+      "pyproject.toml": "runtime-dependency-addition",
+      "Cargo.toml": "runtime-dependency-addition",
+      "go.mod": "runtime-dependency-addition"
+    },
+    "dco": {"required": true, "version": "1.1", "scope": "commits-in-pull-request"},
+    "titlePattern": "^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\\([a-z0-9._/-]+\\))?!?: .+",
+    "mergeMethod": "squash-only",
+    "linearHistory": true,
+    "deleteBranchAfterMerge": true,
+    "materialReview": {
+      "required": true,
+      "minimumIndependentApprovals": 1,
+      "authorAgentMayNotSatisfyReview": true,
+      "unclassifiedRequiresIndependentReview": true
+    }
+  },
+  "issue": {
+    "implementationReadyFields": [
+      "issueKind",
+      "problem",
+      "desiredOutcome",
+      "scope",
+      "nonGoals",
+      "acceptanceCriteria",
+      "testExpectations",
+      "securityImplications",
+      "documentationImplications",
+      "dependencies",
+      "humanDecisionPoints"
+    ],
+    "implementationReadyFieldTypes": {
+      "issueKind": "issue-kind", "problem": "string", "desiredOutcome": "string", "scope": "non-empty-array",
+      "nonGoals": "non-empty-array", "acceptanceCriteria": "non-empty-array",
+      "testExpectations": "string", "securityImplications": "string",
+      "documentationImplications": "string", "dependencies": "non-empty-array",
+      "humanDecisionPoints": "non-empty-array"
+    },
+    "inactiveReviewDays": 30,
+    "closeOrRescopeDays": 90,
+    "credibleNextActionPreservesIssue": true,
+    "speculativeMultiYearRoadmapsProhibited": true
+  },
+  "externalContributions": {
+    "issuesAllowed": true,
+    "pullRequestsAllowed": true,
+    "maintainerGatesRequired": true,
+    "forkSafeWorkflowsRequired": true
+  },
+  "rules": [
+    {"id": "PRS-PR-SIZE-001", "severity": "blocking", "remediation": "Split the pull request or link a valid approved exception."},
+    {"id": "PRS-DCO-001", "severity": "blocking", "remediation": "Add a DCO 1.1 Signed-off-by trailer to each contributed commit."},
+    {"id": "PRS-PR-TITLE-001", "severity": "blocking", "remediation": "Use a Conventional Commit-formatted pull request title."},
+    {"id": "PRS-MATERIAL-001", "severity": "blocking", "remediation": "Obtain approval from an agent other than the author agent."},
+    {"id": "PRS-ISSUE-READY-001", "severity": "blocking", "remediation": "Complete every implementation-ready issue field."},
+    {"id": "PRS-ISSUE-AGING-001", "severity": "warning", "remediation": "Review at 30 days and close or rescope at 90 days without a credible next action."}
+  ]
+}

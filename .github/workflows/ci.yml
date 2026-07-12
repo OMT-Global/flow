@@ -36,6 +36,9 @@ jobs:
       - name: Validate contribution lifecycle policy
         run: python scripts/flow/evaluate_contribution.py
 
+      - name: Build and verify policy release offline
+        run: python scripts/flow/build_policy_release.py --output /tmp/flow-policy-release-ci --version 1.0.0 --verify
+
       - name: Test public repository policy bundle
         run: python -m unittest discover -s tests -v
 

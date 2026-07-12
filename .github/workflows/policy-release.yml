@@ -1,0 +1,141 @@
+name: Publish Policy Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_issue:
+        description: Governing release issue number
+        required: true
+        type: string
+      previous_version:
+        description: Previously published policy version, or 0.0.0 for the first release
+        required: true
+        type: string
+      independent_review_evidence:
+        description: Approved merged pull request number required for minor and major releases
+        required: false
+        type: string
+      adr:
+        description: Repository-relative ADR path required for major releases
+        required: false
+        type: string
+      migration_guide:
+        description: Repository-relative migration guide path required for major releases
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require exact immutable tag ref
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          [[ "$REF_TYPE" == "tag" ]] || { echo "Run this workflow against an exact release tag." >&2; exit 1; }
+          python3 -c 'import re,sys; sys.exit(0 if re.fullmatch(r"v(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)", sys.argv[1]) else 1)' "$TAG"
+
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Require repository immutable-release enforcement
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          enabled="$(gh api "repos/${GITHUB_REPOSITORY}/immutable-releases" --jq '.enabled')"
+          [[ "$enabled" == "true" ]] || { echo "Immutable releases must be enabled before publication." >&2; exit 1; }
+
+      - name: Enforce upgrade gate and release evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          PREVIOUS: ${{ inputs.previous_version }}
+          REVIEW: ${{ inputs.independent_review_evidence }}
+          ADR: ${{ inputs.adr }}
+          MIGRATION: ${{ inputs.migration_guide }}
+        run: |
+          latest="$(gh release list --limit 1 --json tagName --jq '.[0].tagName // "v0.0.0"')"
+          [[ "$latest" == "v${PREVIOUS}" ]] || { echo "previous_version ${PREVIOUS} does not match latest release ${latest}." >&2; exit 1; }
+          gate="$(python3 -c 'import sys; from scripts.flow.build_policy_release import upgrade_gate; print(upgrade_gate(sys.argv[1], sys.argv[2]))' "$PREVIOUS" "${TAG#v}")"
+          case "$gate" in
+            tests-may-auto-merge) ;;
+            independent-agent-review)
+              [[ "$REVIEW" =~ ^[0-9]+$ ]] || { echo "Minor releases require an approved pull request number." >&2; exit 1; }
+              ;;
+            material-notification-and-adr)
+              [[ "$REVIEW" =~ ^[0-9]+$ ]] || { echo "Major releases require an approved pull request number." >&2; exit 1; }
+              [[ "$ADR" =~ ^docs/decisions/ADR-[A-Za-z0-9._-]+\.md$ ]] || { echo "ADR must be a docs/decisions/ADR-*.md path." >&2; exit 1; }
+              [[ "$MIGRATION" =~ ^docs/[A-Za-z0-9._/-]+\.md$ && "$MIGRATION" != *..* ]] || { echo "Migration guide must be a normalized Markdown path under docs/." >&2; exit 1; }
+              for evidence_path in "$ADR" "$MIGRATION"; do
+                [[ ! -L "$evidence_path" ]] || { echo "Release evidence cannot be a symlink: ${evidence_path}" >&2; exit 1; }
+                mode="$(git ls-tree "$GITHUB_SHA" -- "$evidence_path" | awk '{print $2}')"
+                [[ "$mode" == "blob" ]] || { echo "Release evidence must be a tracked regular file at ${GITHUB_SHA}: ${evidence_path}" >&2; exit 1; }
+                git cat-file -e "${GITHUB_SHA}:${evidence_path}"
+              done
+              ;;
+            *) echo "Unknown upgrade gate: $gate" >&2; exit 1 ;;
+          esac
+          if [[ "$gate" != "tests-may-auto-merge" ]]; then
+            pr="$(gh pr view "$REVIEW" --json author,mergeCommit,reviewDecision,state)"
+            [[ "$(jq -r '.state' <<<"$pr")" == "MERGED" && "$(jq -r '.reviewDecision' <<<"$pr")" == "APPROVED" && "$(jq -r '.mergeCommit.oid' <<<"$pr")" == "$GITHUB_SHA" ]] || { echo "Review PR must be merged, approved, and produce the tagged commit." >&2; exit 1; }
+            author="$(jq -r '.author.login' <<<"$pr")"
+            reviews="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${REVIEW}/reviews")"
+            jq -e --arg author "$author" '[.[] | select(.state == "APPROVED" and .user.login != $author)] | length > 0' <<<"$reviews" >/dev/null || { echo "Independent non-author approval is required." >&2; exit 1; }
+          fi
+
+      - name: Run policy validation and tests
+        run: |
+          python3 -m unittest discover -s tests -v
+          python3 scripts/flow/validate_policy_bundle.py
+          python3 scripts/flow/validate_transition.py
+          python3 scripts/flow/evaluate_contribution.py
+          python3 scripts/flow/validate_provenance.py
+
+      - name: Notify governing issue and configured repository channel
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE: ${{ inputs.release_issue }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh issue comment "$ISSUE" --body "Material action notification: publishing immutable Flow policy release ${TAG} from ${GITHUB_SHA}. Execution continues after required gates."
+          gh api "repos/${GITHUB_REPOSITORY}/dispatches" --method POST -f event_type=material-policy-release -f "client_payload[tag]=${TAG}" -f "client_payload[issue]=${ISSUE}" -f "client_payload[commit]=${GITHUB_SHA}"
+
+      - name: Build and verify release assets
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          version="${TAG#v}"
+          python3 scripts/flow/build_policy_release.py --output dist/policy-release --version "$version" --verify
+
+      - name: Publish immutable GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release view "$TAG" >/dev/null 2>&1 && { echo "Release ${TAG} already exists; refusing overwrite." >&2; exit 1; }
+          gh release create "$TAG" dist/policy-release/* --verify-tag --title "Flow Policy ${TAG}" --generate-notes
+
+      - name: Download and verify published assets offline
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          mkdir -p /tmp/flow-policy-postpublish
+          gh release download "$TAG" --dir /tmp/flow-policy-postpublish
+          python3 /tmp/flow-policy-postpublish/verify_policy_release.py --output /tmp/flow-policy-postpublish --verify-only
+
+      - name: Record postpublication evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE: ${{ inputs.release_issue }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          immutable="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}" --jq '.immutable')"
+          [[ "$immutable" == "true" ]] || { echo "Published release is not reported immutable." >&2; exit 1; }
+          gh issue comment "$ISSUE" --body "Postpublication verification passed for ${TAG}. Workflow: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}; commit: ${GITHUB_SHA}."

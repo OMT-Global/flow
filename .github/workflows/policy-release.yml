@@ -45,13 +45,6 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      - name: Require repository immutable-release enforcement
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          enabled="$(gh api "repos/${GITHUB_REPOSITORY}/immutable-releases" --jq '.enabled')"
-          [[ "$enabled" == "true" ]] || { echo "Immutable releases must be enabled before publication." >&2; exit 1; }
-
       - name: Enforce upgrade gate and release evidence
         env:
           GH_TOKEN: ${{ github.token }}

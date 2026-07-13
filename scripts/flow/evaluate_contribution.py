@@ -78,7 +78,19 @@ def validate_policy(policy: Any, standard: Any) -> list[str]:
     }
     if pr.get("exclusionPatterns") != expected_exclusions:
         errors.append("$.pullRequest.exclusionPatterns: required deterministic patterns changed")
-    expected_triggers = {"schemas/**": "public-api-change", "migrations/**": "database-migration", ".github/workflows/**": "repository-settings-change", "package.json": "runtime-dependency-addition", "pyproject.toml": "runtime-dependency-addition", "Cargo.toml": "runtime-dependency-addition", "go.mod": "runtime-dependency-addition"}
+    expected_triggers = {
+        "schemas/**": "public-api-change",
+        "migrations/**": "database-migration",
+        ".github/workflows/**": "repository-settings-change",
+        "package.json": "runtime-dependency-addition",
+        "**/package.json": "runtime-dependency-addition",
+        "pyproject.toml": "runtime-dependency-addition",
+        "**/pyproject.toml": "runtime-dependency-addition",
+        "Cargo.toml": "runtime-dependency-addition",
+        "**/Cargo.toml": "runtime-dependency-addition",
+        "go.mod": "runtime-dependency-addition",
+        "**/go.mod": "runtime-dependency-addition",
+    }
     if pr.get("materialPathTriggers") != expected_triggers:
         errors.append("$.pullRequest.materialPathTriggers: required material triggers changed")
     if not isinstance(pr.get("titlePattern"), str) or pr["titlePattern"] != "^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\\([a-z0-9._/-]+\\))?!?: .+":

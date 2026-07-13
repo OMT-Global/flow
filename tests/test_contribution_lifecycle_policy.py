@@ -204,6 +204,21 @@ class ContributionLifecyclePolicyTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "missing required material actions"):
             self.evaluator.evaluate_pr(self.policy, self.standard, pr)
 
+    def test_nested_runtime_manifests_require_material_classification(self) -> None:
+        for path in (
+            "packages/app/package.json",
+            "services/api/pyproject.toml",
+            "crates/core/Cargo.toml",
+            "cmd/tool/go.mod",
+        ):
+            with self.subTest(path=path):
+                pr = base_pr(); pr["files"] = [{"path": path, "additions": 5, "deletions": 0}]; seal(pr)
+                with self.assertRaisesRegex(ValueError, "missing required material actions"):
+                    self.evaluator.evaluate_pr(self.policy, self.standard, pr)
+                pr["materialClassification"]["actions"] = ["runtime-dependency-addition"]
+                pr["approvals"] = [{"agentId": "agent:b", "state": "approved", "evidence": "pr:1#review2"}]
+                self.assertNotIn("PRS-MATERIAL-001", self.evaluator.evaluate_pr(self.policy, self.standard, pr)["blockingRuleIds"])
+
     def test_roadmap_item_requires_evidenced_action(self) -> None:
         result = self.evaluator.evaluate_issue(self.policy, {"issueKind": "roadmap"}, inactive_days=0, next_action=None)
         self.assertIn("issueKind", result["invalidFields"])

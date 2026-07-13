@@ -96,6 +96,7 @@ class PolicyReleaseTests(unittest.TestCase):
 
     def test_publication_workflow_authenticates_release_evidence(self) -> None:
         workflow = (ROOT / ".github" / "workflows" / "policy-release.yml").read_text()
+        self.assertIn("pull-requests: read", workflow)
         self.assertIn('gh pr view "$REVIEW" --json author,mergeCommit,reviewDecision,state', workflow)
         self.assertIn('.mergeCommit.oid', workflow)
         self.assertIn('.user.login != $author', workflow)

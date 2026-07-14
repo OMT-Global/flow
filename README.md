@@ -21,7 +21,7 @@ For the high-level relationship between `flow`, `bootstrap`, `.github`, individu
 - [`schemas/`](schemas/) - issue and PR contract schemas.
 - [`github/`](github/) - canonical labels, issue templates, project fields, and PR template inputs.
 - [`dashboards/`](dashboards/) - saved query patterns for operational review.
-- [`scripts/flow/inspect_repo_flow.py`](scripts/flow/inspect_repo_flow.py) - local inspector for repo flow metadata.
+- [`scripts/flow/inspect_repo_flow.py`](scripts/flow/inspect_repo_flow.py) - read-only-by-default inspector for repo flow metadata; see the [operator guide](docs/flow-inspector.md).
 - [`docs/autonomous-flow-platform.md`](docs/autonomous-flow-platform.md) - design rationale and rollout plan.
 - [`docs/omt-global-operating-map.md`](docs/omt-global-operating-map.md) - org-level ownership map.
 
@@ -52,14 +52,19 @@ Open PR clearance has priority over starting new implementation work:
 ```sh
 python -m json.tool schemas/issue-contract.schema.json >/dev/null
 python -m json.tool schemas/pr-contract.schema.json >/dev/null
-python -m py_compile scripts/flow/inspect_repo_flow.py
+python -m py_compile scripts/flow/inspector_core.py scripts/flow/inspect_repo_flow.py
+python -m unittest discover -s tests -v
 ```
 
-Run the repo CI gate before opening a PR:
+Inspect a repository without mutating GitHub or local assignment state:
 
 ```sh
-bash scripts/ci/run-fast-checks.sh
+python scripts/flow/inspect_repo_flow.py --repo OMT-Global/flow --issues
 ```
+
+The inspector requires explicit mutation flags and explicit output/assignment
+paths. Review the proposed writes in the default report before following the
+[apply examples](docs/flow-inspector.md#apply-reviewed-writes).
 
 ## Bootstrap Relationship
 

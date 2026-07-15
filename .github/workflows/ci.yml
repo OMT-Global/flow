@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -21,26 +22,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
-      - name: Validate JSON schemas
-        run: python -m json.tool schemas/issue-contract.schema.json >/dev/null && python -m json.tool schemas/pr-contract.schema.json >/dev/null && python -m json.tool schemas/public-repository-standard-v1.schema.json >/dev/null && python -m json.tool schemas/provenance-manifest-v1.schema.json >/dev/null
+      - name: Run fast checks
+        run: bash scripts/ci/run-fast-checks.sh
 
-      - name: Validate public repository policy bundle
-        run: python scripts/flow/validate_policy_bundle.py
+  workflow-lint:
+    name: Workflow Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
-      - name: Validate executable transition policy
-        run: python scripts/flow/validate_transition.py
+      - name: Run actionlint with repository runner labels
+        run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
 
-      - name: Validate security and provenance policy
-        run: python scripts/flow/validate_provenance.py
+  extended-validation:
+    name: Extended Validation
+    if: github.event_name != 'pull_request'
+    runs-on:
+      - self-hosted
+      - linux
+      - shell-only
+      - public
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
-      - name: Validate contribution lifecycle policy
-        run: python scripts/flow/evaluate_contribution.py
-
-      - name: Build and verify policy release offline
-        run: python scripts/flow/build_policy_release.py --output /tmp/flow-policy-release-ci --version 1.0.0 --verify
-
-      - name: Test public repository policy bundle
-        run: python -m unittest discover -s tests -v
-
-      - name: Compile flow inspector
-        run: python -m py_compile scripts/flow/inspector_core.py scripts/flow/inspect_repo_flow.py
+      - name: Build and verify release contract
+        run: bash scripts/ci/run-extended-validation.sh

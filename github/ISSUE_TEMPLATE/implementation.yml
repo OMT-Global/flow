@@ -1,12 +1,9 @@
 name: Implementation work
-about: Durable contract for autonomous or review-gated implementation work.
+description: Durable contract for autonomous or review-gated implementation work
 title: ""
-labels: ["state:intake"]
+labels:
+  - state:intake
 body:
-  - type: markdown
-    attributes:
-      value: |
-        Use this form for work that should be executable by Pheidon or a worker lane.
   - type: textarea
     id: problem
     attributes:
@@ -19,9 +16,6 @@ body:
     attributes:
       label: Acceptance criteria
       description: Concrete conditions that make this done.
-      placeholder: |
-        - ...
-        - ...
     validations:
       required: true
   - type: textarea
@@ -29,9 +23,6 @@ body:
     attributes:
       label: Validation commands
       description: Commands or checks the worker should run.
-      placeholder: |
-        - npm test
-        - cargo test --locked
     validations:
       required: true
   - type: dropdown
@@ -60,13 +51,3 @@ body:
         - Human
     validations:
       required: true
-  - type: textarea
-    id: dependencies
-    attributes:
-      label: Dependencies / blockers
-      description: Known blockers, prerequisites, or related issues/PRs.
-  - type: textarea
-    id: out_of_scope
-    attributes:
-      label: Out of scope
-      description: Explicitly excluded work.

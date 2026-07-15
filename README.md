@@ -52,10 +52,13 @@ Open PR clearance has priority over starting new implementation work:
 ## Validation
 
 ```sh
-python -m json.tool schemas/issue-contract.schema.json >/dev/null
-python -m json.tool schemas/pr-contract.schema.json >/dev/null
-python -m py_compile scripts/flow/inspector_core.py scripts/flow/inspect_repo_flow.py
-python -m unittest discover -s tests -v
+bash scripts/ci/run-fast-checks.sh
+```
+
+For mainline or release-contract validation, including an offline deterministic policy build:
+
+```sh
+bash scripts/ci/run-extended-validation.sh
 ```
 
 Inspect a repository without mutating GitHub or local assignment state:

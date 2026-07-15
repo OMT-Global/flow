@@ -1,7 +1,8 @@
 # ADR-0001: Make Flow the authority for Public Repository Standard v1
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-07-11
+- Accepted: 2026-07-15
 - Decision owners: Flow maintainers
 - Material notification: [Flow issue #8](https://github.com/OMT-Global/flow/issues/8) and the discovery pull request
 
@@ -63,6 +64,18 @@ Rejected because `project.bootstrap.yaml` must remain the sole editable reposito
 5. Remove superseded definitions only after managed repositories have a supported migration path.
 
 Implementation is tracked by [#8](https://github.com/OMT-Global/flow/issues/8), [#9](https://github.com/OMT-Global/flow/issues/9), [#10](https://github.com/OMT-Global/flow/issues/10), [#11](https://github.com/OMT-Global/flow/issues/11), [#12](https://github.com/OMT-Global/flow/issues/12), and [#13](https://github.com/OMT-Global/flow/issues/13).
+
+## Implementation evidence
+
+The decision is implemented and released:
+
+- [PR #15](https://github.com/OMT-Global/flow/pull/15) established the publisher-neutral policy bundle and schema.
+- [PR #16](https://github.com/OMT-Global/flow/pull/16) made work and release transitions executable.
+- [PR #17](https://github.com/OMT-Global/flow/pull/17) added contribution-lifecycle, review, and immutable-release contracts.
+- [PR #18](https://github.com/OMT-Global/flow/pull/18) defined security response and provenance semantics.
+- The immutable [v1.0.1 policy release](https://github.com/OMT-Global/flow/releases/tag/v1.0.1) was published and independently verified under [issue #23](https://github.com/OMT-Global/flow/issues/23).
+
+Acceptance records the policy decision; it does not claim that every consumer has migrated. Flow's plan-first Bootstrap dogfood remains tracked by [issue #13](https://github.com/OMT-Global/flow/issues/13), and generated governance reconciliation remains tracked by [issue #25](https://github.com/OMT-Global/flow/issues/25).
 
 ## Security and privacy
 

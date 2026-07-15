@@ -2,6 +2,14 @@
 
 Flow publishes the authoritative repository policy vocabulary and work-state semantics. Bootstrap consumes released policy and projects it into managed repositories.
 
+## Current authority
+
+- Current immutable release: [`v1.0.1`](https://github.com/OMT-Global/flow/releases/tag/v1.0.1)
+- Accepted decision: [`ADR-0001`](decisions/ADR-0001-public-repository-standard-v1.md)
+- Historical discovery record: [`Public Repository Standard v1 gap analysis`](public-repository-standard-gap-analysis.md)
+
+The files below are the canonical source for policy semantics on the repository's development branch. Production consumers must resolve the immutable release rather than this branch.
+
 ## Public Repository Standard v1
 
 - Canonical bundle: [`policies/public-repository-standard-v1.json`](../policies/public-repository-standard-v1.json)

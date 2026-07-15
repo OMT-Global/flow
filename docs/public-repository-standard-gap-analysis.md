@@ -1,5 +1,21 @@
 # Public Repository Standard v1 gap analysis: Flow
 
+> **Historical analysis — superseded for current status.** This document records the repository state reviewed on 2026-07-11. The implemented policy bundle, its immutable release, and the linked follow-up issues are the current evidence; the original findings below are preserved rather than rewritten.
+
+## Implementation outcome
+
+As of 2026-07-15, the policy-definition lanes identified here have landed:
+
+| Lane | Current evidence |
+|---|---|
+| Vocabulary and policy bundle | [Issue #8](https://github.com/OMT-Global/flow/issues/8), merged by [PR #15](https://github.com/OMT-Global/flow/pull/15) |
+| Executable transitions | [Issue #9](https://github.com/OMT-Global/flow/issues/9), merged by [PR #16](https://github.com/OMT-Global/flow/pull/16) |
+| Contribution lifecycle and release contract | [Issues #10](https://github.com/OMT-Global/flow/issues/10) and [#12](https://github.com/OMT-Global/flow/issues/12), merged by [PR #17](https://github.com/OMT-Global/flow/pull/17) |
+| Security and provenance | [Issue #11](https://github.com/OMT-Global/flow/issues/11), merged by [PR #18](https://github.com/OMT-Global/flow/pull/18) |
+| Immutable policy publication | [v1.0.1](https://github.com/OMT-Global/flow/releases/tag/v1.0.1), verified under [issue #23](https://github.com/OMT-Global/flow/issues/23) |
+
+The current source of truth is the [policy index](policy-index.md), which points to the canonical policy data, schemas, compatibility guidance, and accepted architecture decision. Remaining migration work is intentionally tracked outside this historical snapshot: [#13](https://github.com/OMT-Global/flow/issues/13) for Flow dogfooding, [#25](https://github.com/OMT-Global/flow/issues/25) for generated governance and operator guidance, and [#26](https://github.com/OMT-Global/flow/issues/26) for human-approved stewardship surfaces. This document's retirement is tracked by [#27](https://github.com/OMT-Global/flow/issues/27).
+
 ## Outcome
 
 Flow has solid fragments for agent roles, autonomy, issue/PR work states, merge gates, and a governed release train. It does not yet provide the single versioned, publisher-neutral, machine-readable policy model required by Public Repository Standard v1. The safe migration is additive: establish vocabulary and schemas first, test them, publish an immutable policy release, then let Bootstrap consume it.

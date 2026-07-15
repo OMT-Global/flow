@@ -24,6 +24,8 @@ For the high-level relationship between `flow`, `bootstrap`, `.github`, individu
 - [`scripts/flow/inspect_repo_flow.py`](scripts/flow/inspect_repo_flow.py) - read-only-by-default inspector for repo flow metadata; see the [operator guide](docs/flow-inspector.md).
 - [`docs/autonomous-flow-platform.md`](docs/autonomous-flow-platform.md) - design rationale and rollout plan.
 - [`docs/omt-global-operating-map.md`](docs/omt-global-operating-map.md) - org-level ownership map.
+- [`docs/policy-index.md`](docs/policy-index.md) - current policy authority, release, and implementation evidence.
+- [`docs/public-repository-standard-gap-analysis.md`](docs/public-repository-standard-gap-analysis.md) - historical discovery record and links to remaining migration work.
 
 ## Controller Loop
 
@@ -81,7 +83,9 @@ paths. Review the proposed writes in the default report before following the
 
 ## Release Standard
 
-This repository uses release maturity level `simple`. Level 1 `simple` keeps immutable exact SemVer tags such as `v1.2.3`, then automatically advances the floating compatibility tags `v1.2` and `v1` to the same commit. Level 2 `governed` adds preflight, full validation, explicit publish approval, postpublish verification, and release evidence.
+The current immutable policy release is [`v1.0.1`](https://github.com/OMT-Global/flow/releases/tag/v1.0.1). Production consumers must pin an exact SemVer release or immutable commit SHA; `main` and floating compatibility aliases are discovery aids only and are never valid production policy references.
+
+This repository uses release maturity level `simple`. Level 1 `simple` publishes immutable exact SemVer tags such as `v1.2.3` and may advance floating discovery aliases such as `v1.2` and `v1`. Level 2 `governed` adds preflight, full validation, explicit publish approval, postpublish verification, and release evidence.
 
 Cut patch releases from `release/X.Y` branches when you maintain an older minor line. Cut new minor and major releases from `main`.
 

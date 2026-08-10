@@ -15,6 +15,8 @@ repo:
     - .github/ISSUE_TEMPLATE/implementation.yml
     - .github/ISSUE_TEMPLATE/flow_blocker.yml
     - .github/ISSUE_TEMPLATE/release_train.yml
+    - .githooks/**
+    - docs/bootstrap/onboarding.md
 archetype:
   kind: generic-empty
 github:
@@ -31,6 +33,8 @@ github:
     hasWiki: false
     hasDiscussions: true
 ci:
+  codeqlLanguages:
+    - python
   runnerPolicy: hybrid-safe
 agents:
   sharedSkills:

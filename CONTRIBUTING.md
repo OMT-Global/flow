@@ -7,7 +7,6 @@ Contributions should start from a GitHub issue that is assigned or explicitly en
 - Install dependencies for the selected stack before changing code.
 - Enable repo hooks with `git config core.hooksPath .githooks`; they block direct commits to `main` and catch committed runtime env files.
 - Use `project.bootstrap.yaml` as the source of truth for governance, CI, environments, and bootstrap-managed guidance files.
-- Review `docs/bootstrap/onboarding.md` before the first merge after governance changes.
 
 ## Change Expectations
 
@@ -18,8 +17,9 @@ Contributions should start from a GitHub issue that is assigned or explicitly en
 
 ## Validation
 
-- Run `bash scripts/ci/run-fast-checks.sh` before opening a PR.
-- Run `bash scripts/ci/run-extended-validation.sh` for release, policy-package, or mainline validation changes.
+- Run the relevant local checks before opening a PR.
+- At the start of agent-authored PR work, request autoreview network access and, for private repository diffs, explicit authorization for the forthcoming intended PR diff. At closeout, use the `autoreview` skill against the actual base. Verify every finding, address accepted in-scope findings, and rerun affected checks and autoreview after edits until no accepted/actionable findings remain.
+- Record the final autoreview command and result in the PR. If authorization is declined or the skill is unavailable or cannot complete, stop and report that blocker instead of opening or updating the PR.
 - For this bootstrap contract, the required PR check surface is `CI Gate`.
 - Document any skipped checks in the PR with a concrete reason.
 

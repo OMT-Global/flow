@@ -1,18 +1,29 @@
-#!/bin/sh
-set -eu
+#!/usr/bin/env bash
+set -euo pipefail
 
-branch="$(git symbolic-ref --quiet --short HEAD || true)"
-case "$branch" in
-  main|master)
-    echo "Direct commits to $branch are blocked; create a feature branch." >&2
-    exit 1
-    ;;
-esac
-
-staged="$(git diff --cached --name-only --diff-filter=ACMR)"
-if printf '%s\n' "$staged" | grep -Eq '(^|/)\.env($|\.)|(^|/)(__pycache__|\.pytest_cache)(/|$)|\.py[co]$'; then
-  echo "Refusing to commit runtime environment or Python cache files." >&2
+branch="$(git symbolic-ref --quiet --short HEAD 2>/dev/null || echo HEAD)"
+if [[ "$branch" == "main" || "$branch" == "master" ]]; then
+  echo "ERROR: commits to $branch are blocked. Create a feature branch." >&2
   exit 1
 fi
 
-bash scripts/ci/run-fast-checks.sh
+staged_files=()
+while IFS= read -r -d '' staged_file; do
+  staged_files+=("$staged_file")
+done < <(git diff --cached --name-only --diff-filter=ACMR -z)
+
+for f in "${staged_files[@]:-}"; do
+  [[ -n "$f" ]] || continue
+  case "$f" in
+    *.env|.env.*)
+      if [[ "$f" != *.example ]]; then
+        echo "ERROR: cannot commit env file '$f'. Use .env.example templates instead." >&2
+        exit 1
+      fi
+      ;;
+  esac
+done
+
+if [[ -x scripts/check-detect-secrets.sh ]]; then
+  bash scripts/check-detect-secrets.sh --staged
+fi

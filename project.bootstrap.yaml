@@ -7,16 +7,11 @@ project:
   owner: OMT-Global
   defaultBranch: main
 repo:
+  # Flow's canonical github/ inputs, guidance, and validating hook are product-owned.
+  # Only unchanged generic projections are delegated to Bootstrap.
   managedPaths:
-    - AGENTS.md
-    - CONTRIBUTING.md
-    - README.md
-    - .github/PULL_REQUEST_TEMPLATE.md
     - .github/ISSUE_TEMPLATE/implementation.yml
     - .github/ISSUE_TEMPLATE/flow_blocker.yml
-    - .github/ISSUE_TEMPLATE/release_train.yml
-    - .githooks/**
-    - docs/bootstrap/onboarding.md
 archetype:
   kind: generic-empty
 github:

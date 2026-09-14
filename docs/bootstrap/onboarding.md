@@ -4,9 +4,11 @@ Review this file before the first merge after Bootstrap changes repository gover
 
 ## Managed and product-owned boundaries
 
-`project.bootstrap.yaml` is the repository control plane. Its `repo.managedPaths` list identifies Bootstrap-managed guidance and GitHub templates. Product code, policy data, validators, CI scripts, and canonical `github/` inputs remain product-owned unless the manifest says otherwise.
+`project.bootstrap.yaml` is the repository control plane. Its `repo.managedPaths` list delegates only the implementation and flow-blocker issue-form projections to Bootstrap. Their canonical `github/` inputs remain product-owned, and the repository contract requires byte-identical projections. `.bootstrap/managed-files.json` records the generated ownership hashes.
 
-Run Bootstrap in plan mode and review the managed/product-owned inventory before apply. Flow issue [#13](https://github.com/OMT-Global/flow/issues/13) records the current plan evidence and the external resolver/projection blocker.
+Flow owns `AGENTS.md`, `CONTRIBUTING.md`, `README.md`, this onboarding guide, `.githooks/pre-commit`, the canonical and projected PR/release-train templates, product code, policy data, validators, and CI scripts. The generic archetype cannot currently preserve Flow's exact runner selector, immutable production-pin guidance, canonical PR template, or fast-check/cache-rejecting hook. Do not apply generic replacements to those paths. This ownership boundary does not waive any review, CI, security, or release gate.
+
+The recovery used Bootstrap commit `99455ebc120bc91987ee2f7f9a7c097ae73021dc` through its repository-only `loadManifest` / `planRepo` / `applyRepo` APIs. No GitHub governance apply is needed. Run Bootstrap in plan mode and review the managed/product-owned inventory before apply. A clean plan must preserve both issue forms and their canonical counterparts; any content change needs matching canonical-source review before apply. Flow issue [#13](https://github.com/OMT-Global/flow/issues/13) records the current plan evidence and the external resolver/projection blocker.
 
 ## Review and merge gates
 

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "owner": "bootstrap",
+  "templateVersion": "2026.03.28.2",
+  "regenerationCommand": "bootstrap apply repo --manifest ./project.bootstrap.yaml",
+  "managedFiles": {
+    ".github/ISSUE_TEMPLATE/flow_blocker.yml": {
+      "sha256": "bda981825dd7dd683f239a8d6507bab5c722274c0089f00f2ad1cedafa957d3a",
+      "source": "bootstrap"
+    },
+    ".github/ISSUE_TEMPLATE/implementation.yml": {
+      "sha256": "539e9d31f2c6b50dab9c25e8d8964d60ae2d750bf957fbca76cb5f3f96d572be",
+      "source": "bootstrap"
+    }
+  }
+}

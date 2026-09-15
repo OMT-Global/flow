@@ -1,6 +1,8 @@
 self-hosted-runner:
   labels:
     - self-hosted
-    - linux
+    - Linux
+    - X64
     - shell-only
+    - linux
     - public

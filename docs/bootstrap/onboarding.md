@@ -20,9 +20,13 @@ The recovery used Bootstrap commit `99455ebc120bc91987ee2f7f9a7c097ae73021dc` th
 
 ## Runner policy
 
-The manifest's `hybrid-safe` policy maps Flow's shell-safe CI Gate to `[self-hosted, linux, shell-only, public]`. The live job used to verify this contract on 2026-07-15 ran in runner group `linux-public` with those exact labels. Jobs requiring Docker, service containers, browser infrastructure, or a workflow-level `container:` declaration stay on GitHub-hosted runners.
+The manifest's `hybrid-safe` policy is implemented by hosted PR checks and an immutable, input-free trusted callee. Every PR (including same-repository branches) stays hosted. Trusted main push/dispatch uses `linux-flow-trusted` with `[self-hosted, Linux, X64, shell-only]`. The callee rejects all PR events and non-main refs before assignment except the named bootstrap branch, which always checks out the fixed pre-migration trusted revision. No caller-controlled command/ref/artifact inputs or inherited secrets are accepted.
 
-If the workflow selector, this document, `AGENTS.md`, or live job metadata disagree, stop and reconcile the trust boundary before merging.
+`CI Gate`, `Workflow Lint`, and `Extended Validation` report success only after the applicable real checks succeed; a skipped or cancelled required execution is not success. Release publication remains hosted and unchanged. Docker, service containers, and browser workloads remain hosted.
+
+The server-side group must admit only Flow and the full SHA-pinned callee. Flow must be excluded from ALL other self-hosted groups that admit public repositories. Job conditions in mutable PR workflow files are not an isolation boundary. Preserve all other repositories' existing access. The selected existing slot must retain its group after turnover; do not add hosts or slots.
+
+Retain `pheidon/flow-trusted-source` at the immutable source commit: GitHub reusable workflow discovery can fail after the source branch is removed even when the commit API remains readable. Do not delete this ref at squash merge. Callee and caller bytes are bound by the repository guard; any new version requires independent exact-head review, new digests, selector review, and new execution proof. Never repin automatically. Hosted PR CI validates the candidate; bootstrap native CI validates the fixed trusted base; post-merge native CI must validate the merged revision. A different caller-ref negative control is NOT a real fork trial.
 
 ## Local checks
 

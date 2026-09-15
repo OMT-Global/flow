@@ -26,7 +26,7 @@ REQUIRED_LOCAL_PATHS = (
     "scripts/ci/run-extended-validation.sh",
 )
 
-RUNNER_LABELS = ("self-hosted", "linux", "shell-only", "public")
+RUNNER_LABELS = ("self-hosted", "Linux", "X64", "shell-only")
 MARKDOWN_LINK = re.compile(r"\[[^]]*\]\(([^)]+)\)")
 
 
@@ -82,21 +82,17 @@ def check_required_paths(root: Path) -> list[str]:
 def check_runner_contract(root: Path) -> list[str]:
     errors: list[str] = []
     workflow = (root / ".github/workflows/ci.yml").read_text()
-    runner_block = re.search(
-        r"(?ms)^  ci-gate:.*?^    runs-on:\s*\n((?:^      - [^\n]+\n)+)",
-        workflow,
-    )
-    if runner_block is None:
-        errors.append("CI Gate does not declare a list-form runner selector")
-    else:
-        labels = tuple(
-            line.removeprefix("      - ").strip()
-            for line in runner_block.group(1).splitlines()
-        )
-        if labels != RUNNER_LABELS:
-            errors.append(
-                f"CI Gate runner labels {labels!r} do not match {RUNNER_LABELS!r}"
-            )
+    # Whole-file binding defeats event-widening, comment decoys and mutable callers.
+    # Updating either digest requires independent workflow/policy review.
+    import hashlib
+    contracts = {
+        ".github/workflows/trusted-flow.yml": "4f21e5e9d97619beaea6b1afe6e8050e34590ecdc7d53ef7a1e0441587285a0f",
+        ".github/workflows/ci.yml": "fa5a582629cf4687d073b1ec74204ef5baeef9ff9b69b7f7bc6c228bcba41a57",
+    }
+    for path, expected in contracts.items():
+        file = root / path
+        if not file.is_file() or hashlib.sha256(file.read_bytes()).hexdigest() != expected:
+            errors.append(f"unreviewed runner contract bytes: {path}")
 
     documented_selector = f"[{', '.join(RUNNER_LABELS)}]"
     for path in ("AGENTS.md", "docs/bootstrap/onboarding.md"):

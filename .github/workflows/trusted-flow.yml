@@ -1,0 +1,40 @@
+name: Trusted Flow Checks
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  trusted-checks:
+    name: Trusted Flow Checks
+    if: >-
+      github.repository == 'OMT-Global/flow' &&
+      ((github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')) ||
+       (github.ref == 'refs/heads/pheidon/flow-trusted-isolation' && github.event_name == 'workflow_dispatch'))
+    runs-on:
+      group: linux-flow-trusted
+      labels: [self-hosted, Linux, X64, shell-only]
+    timeout-minutes: 20
+    steps:
+      - name: Checkout trusted revision
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.ref == 'refs/heads/main' && github.sha || '165ff16e2cb3cbc176a107eb1c1f99f4f925438d' }}
+          persist-credentials: false
+      - name: Verify revision
+        env:
+          EXPECTED_SHA: ${{ github.ref == 'refs/heads/main' && github.sha || '165ff16e2cb3cbc176a107eb1c1f99f4f925438d' }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+      - name: Set up Go
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version: '1.23.12'
+          cache: false
+      - name: Run fast checks
+        run: bash scripts/ci/run-fast-checks.sh
+      - name: Run actionlint with repository runner labels
+        run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
+      - name: Build and verify release contract
+        run: bash scripts/ci/run-extended-validation.sh

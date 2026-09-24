@@ -26,6 +26,9 @@ For the high-level relationship between `flow`, `bootstrap`, `.github`, individu
 - [`docs/omt-global-operating-map.md`](docs/omt-global-operating-map.md) - org-level ownership map.
 - [`docs/policy-index.md`](docs/policy-index.md) - current policy authority, release, and implementation evidence.
 - [`docs/public-repository-standard-gap-analysis.md`](docs/public-repository-standard-gap-analysis.md) - historical discovery record and links to remaining migration work.
+- [`LICENSE`](LICENSE) - MIT license, projected by Bootstrap from the approved template in [`legal/`](legal/).
+- [`SECURITY.md`](SECURITY.md) - private vulnerability reporting route and policy-sourced response targets.
+- [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) - Contributor Covenant 2.1 with the OMT-Global maintainer enforcement route.
 
 ## Controller Loop
 

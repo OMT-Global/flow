@@ -3,6 +3,11 @@
   "owner": "bootstrap",
   "templateVersion": "2026.03.28.2",
   "regenerationCommand": "bootstrap apply repo --manifest ./project.bootstrap.yaml",
+  "license": {
+    "mode": "spdx",
+    "identifier": "MIT",
+    "contentSha256": "e512083a9d1748e3956b62c6d15e9e3e0f882b86c2f92c1e892ea3182287f052"
+  },
   "managedFiles": {
     ".github/ISSUE_TEMPLATE/flow_blocker.yml": {
       "sha256": "bda981825dd7dd683f239a8d6507bab5c722274c0089f00f2ad1cedafa957d3a",
@@ -10,6 +15,14 @@
     },
     ".github/ISSUE_TEMPLATE/implementation.yml": {
       "sha256": "539e9d31f2c6b50dab9c25e8d8964d60ae2d750bf957fbca76cb5f3f96d572be",
+      "source": "bootstrap"
+    },
+    "LICENSE": {
+      "sha256": "e512083a9d1748e3956b62c6d15e9e3e0f882b86c2f92c1e892ea3182287f052",
+      "source": "bootstrap"
+    },
+    "THIRD_PARTY_NOTICES.md": {
+      "sha256": "157fc9de03ffa00612aa8eca2d3ba2ba87cf6f2cbe8ba02a60eb5340ed210dba",
       "source": "bootstrap"
     }
   }

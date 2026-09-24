@@ -30,3 +30,9 @@ Contributions should start from a GitHub issue that is assigned or explicitly en
 - PR authors may not approve their own PRs.
 - A healthy PR should converge toward auto-merge after required checks pass or are intentionally skipped, approvals are satisfied, and no blocking review state remains.
 - When GitHub plan limits make auto-merge unavailable for a private repo, use the fallback merge-readiness policy: required checks pass or are intentionally skipped, approvals and conversation resolution are satisfied, no blocking review state remains, and a maintainer performs the merge manually.
+
+## Conduct and Security
+
+- Follow the [Code of Conduct](CODE_OF_CONDUCT.md); OMT-Global maintainers are the enforcement authority.
+- Report vulnerabilities privately through [SECURITY.md](SECURITY.md); never in public issues, discussions, or pull requests.
+- This repository is MIT-licensed ([LICENSE](LICENSE)); the approved legal input lives in `legal/`, and Bootstrap projects the managed legal outputs.

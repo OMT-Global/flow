@@ -3,7 +3,7 @@
 - Always work on a feature branch. Hooks block commits to `main` and `master`; enable them with `git config core.hooksPath .githooks`.
 - Stack baseline: Generic polyglot.
 - CI baseline: fast PR checks stay cheap and shell-safe; extended validation runs on `main`, nightly, or manual dispatch.
-- Runner isolation: every PR runs on GitHub-hosted runners. Only the SHA-pinned, input-free trusted callee may use group `linux-flow-trusted` with `[self-hosted, Linux, X64, shell-only]`. Never run PR-controlled code on persistent self-hosted hosts. Docker, service containers, and browser workloads remain hosted. See the onboarding trust-boundary runbook.
+- Runner isolation: every PR and the SHA-pinned, input-free trusted callee run on GitHub-hosted runners. Trusted tests use `ubuntu-24.04` with Python 3.12 and Go 1.23.12. Preserve the callee event, checkout, input, and secret restrictions. See the onboarding trust-boundary runbook.
 - Add or update tests for every interactive, branching, or operator-facing behavior change.
 - PRs must use the generated pull request template. The required PR gate validates summary, issue linkage, validation evidence, and risk notes.
 - Never commit real secrets, runtime auth, or machine-local env files. Use templates and GitHub environments instead.

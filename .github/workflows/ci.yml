@@ -49,7 +49,7 @@ jobs:
 
   trusted:
     if: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/pheidon/flow-trusted-isolation')) }}
-    uses: OMT-Global/flow/.github/workflows/trusted-flow.yml@1a7355259ec004007a8006b9879e4783d73cb9ad
+    uses: OMT-Global/flow/.github/workflows/trusted-flow.yml@92199ad3b33c4c1d3d0d70e1d5839bc799715e35
     permissions:
       contents: read
 

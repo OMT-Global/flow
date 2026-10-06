@@ -26,7 +26,7 @@ REQUIRED_LOCAL_PATHS = (
     "scripts/ci/run-extended-validation.sh",
 )
 
-RUNNER_LABELS = ("self-hosted", "Linux", "X64", "shell-only")
+RUNNER_LABELS = ("self-hosted", "Linux", "X64", "shell-only") # Retained actionlint compatibility labels.
 MARKDOWN_LINK = re.compile(r"\[[^]]*\]\(([^)]+)\)")
 
 
@@ -86,22 +86,22 @@ def check_runner_contract(root: Path) -> list[str]:
     # Updating either digest requires independent workflow/policy review.
     import hashlib
     contracts = {
-        ".github/workflows/trusted-flow.yml": "4f21e5e9d97619beaea6b1afe6e8050e34590ecdc7d53ef7a1e0441587285a0f",
-        ".github/workflows/ci.yml": "fa5a582629cf4687d073b1ec74204ef5baeef9ff9b69b7f7bc6c228bcba41a57",
+        ".github/workflows/trusted-flow.yml": "2ac3ea8628764154c8b62b683781d3fac1654ce57bc133ae3b68d10b16f0f299",
+        ".github/workflows/ci.yml": "e4924f389c58007018e695307115eadeb79ee5cdd41d7ee1b417e866e9b6a2fe",
     }
     for path, expected in contracts.items():
         file = root / path
         if not file.is_file() or hashlib.sha256(file.read_bytes()).hexdigest() != expected:
             errors.append(f"unreviewed runner contract bytes: {path}")
 
-    documented_selector = f"[{', '.join(RUNNER_LABELS)}]"
+    documented_selector = "ubuntu-24.04"
     for path in ("AGENTS.md", "docs/bootstrap/onboarding.md"):
         if documented_selector not in (root / path).read_text():
             errors.append(f"{path} does not document runner selector {documented_selector}")
 
     manifest = (root / "project.bootstrap.yaml").read_text()
-    if "runnerPolicy: hybrid-safe" not in manifest:
-        errors.append("project.bootstrap.yaml must declare ci.runnerPolicy: hybrid-safe")
+    if "runnerPolicy: github-hosted-first" not in manifest:
+        errors.append("project.bootstrap.yaml must declare ci.runnerPolicy: github-hosted-first")
 
     actionlint = (root / ".github/actionlint.yaml").read_text()
     for label in RUNNER_LABELS:

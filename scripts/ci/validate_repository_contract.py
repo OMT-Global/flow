@@ -110,6 +110,21 @@ def check_runner_contract(root: Path) -> list[str]:
     return errors
 
 
+def check_security_contract(root: Path) -> list[str]:
+    """Bind the separately reviewed product-owned additions, without replacing CI."""
+    import hashlib
+    contracts = {
+        ".github/workflows/security.yml": "254db7c97c3e2d2dc118ed1b0a8192a44837596eef47e43b26fbdd6816d74014",
+        ".github/dependabot.yml": "e84a50232096bbb25263cf91b217b8425ba7d5e229c03a05494a1b9a5bd6c9ac",
+    }
+    return [
+        f"unreviewed security contract bytes: {path}"
+        for path, expected in contracts.items()
+        if not (root / path).is_file()
+        or hashlib.sha256((root / path).read_bytes()).hexdigest() != expected
+    ]
+
+
 def check_release_guidance(root: Path) -> list[str]:
     errors: list[str] = []
     readme = (root / "README.md").read_text()
@@ -127,6 +142,7 @@ def validate(root: Path = ROOT) -> list[str]:
         check_markdown_links,
         check_required_paths,
         check_runner_contract,
+        check_security_contract,
         check_release_guidance,
     )
     return [error for check in checks for error in check(root)]

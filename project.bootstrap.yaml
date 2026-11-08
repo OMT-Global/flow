@@ -1,4 +1,4 @@
-version: 1
+version: 2
 project:
   name: flow
   displayName: OMT-Global Flow
@@ -6,6 +6,7 @@ project:
   visibility: public
   owner: OMT-Global
   defaultBranch: main
+  maturity: stable
 # Stewardship projection approved in OMT-Global/flow#26 (maintainer decision 2026-07-15):
 # MIT license rendered from the repo-local approved template; GitHub private
 # vulnerability reporting is the confidential security route. legal/ is a
@@ -34,6 +35,7 @@ repo:
     # match released Flow policy v1.0.1 (policies/security-provenance-v1.json),
     # so the generic Bootstrap security projection is explicitly opted out.
     security: false
+  class: specification
 archetype:
   kind: generic-empty
 github:
@@ -50,10 +52,27 @@ github:
     hasWiki: false
     hasDiscussions: true
 ci:
+  codeqlSetup: default
+  dependabot:
+    enabled: true
+    securityUpdates: true
+    versionUpdates: true
+    ecosystems:
+      - packageEcosystem: github-actions
+        directory: /
+        interval: weekly
+        groupMinorAndPatch: false
+        ignoreMajorUpdates: true
   codeqlLanguages:
+    - actions
     - python
   runnerPolicy: github-hosted-first
 agents:
   sharedSkills:
     - github
     - gh-issues
+policy:
+  flow:
+    ref: refs/tags/v1.0.1
+    sha256: 52877f4225a192c6ac2250a7f289f479be83a923ce15152c517db77ab0d5249d
+    bundlePath: policies/public-repository-standard-v1.json

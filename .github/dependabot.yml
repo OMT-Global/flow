@@ -1,0 +1,12 @@
+# Product-owned Flow Actions dependency policy; OMT-Global/bootstrap#63.
+# Existing security-update enablement remains a GitHub setting, not this file.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"

@@ -43,6 +43,9 @@ github:
   flowGovernance: true
   autoMerge: true
   deleteBranchOnMerge: true
+  allowMergeCommit: false
+  allowSquashMerge: true
+  allowRebaseMerge: false
   requiredApprovals: 1
   requiredStatusChecks:
     - CI Gate

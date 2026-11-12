@@ -87,7 +87,7 @@ def check_runner_contract(root: Path) -> list[str]:
     import hashlib
     contracts = {
         ".github/workflows/trusted-flow.yml": "dfecf2633914045223321c992f1e9e752abc2c72db57e2cffe8ccbfd79d14de8",
-        ".github/workflows/ci.yml": "162a5a11e4b8d7b55e3f89fd654bf1aa55538f2daafd8703fcd432ebd354594d",
+        ".github/workflows/ci.yml": "2a7fab6ce5d0fdbb549b2c3112f7d6c4f0cd02b42b80ac67d08c2d5a1868dce1",
     }
     for path, expected in contracts.items():
         file = root / path

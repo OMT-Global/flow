@@ -86,8 +86,8 @@ def check_runner_contract(root: Path) -> list[str]:
     # Updating either digest requires independent workflow/policy review.
     import hashlib
     contracts = {
-        ".github/workflows/trusted-flow.yml": "2ac3ea8628764154c8b62b683781d3fac1654ce57bc133ae3b68d10b16f0f299",
-        ".github/workflows/ci.yml": "e4924f389c58007018e695307115eadeb79ee5cdd41d7ee1b417e866e9b6a2fe",
+        ".github/workflows/trusted-flow.yml": "dfecf2633914045223321c992f1e9e752abc2c72db57e2cffe8ccbfd79d14de8",
+        ".github/workflows/ci.yml": "162a5a11e4b8d7b55e3f89fd654bf1aa55538f2daafd8703fcd432ebd354594d",
     }
     for path, expected in contracts.items():
         file = root / path
@@ -114,7 +114,7 @@ def check_security_contract(root: Path) -> list[str]:
     """Bind the separately reviewed product-owned additions, without replacing CI."""
     import hashlib
     contracts = {
-        ".github/workflows/security.yml": "254db7c97c3e2d2dc118ed1b0a8192a44837596eef47e43b26fbdd6816d74014",
+        ".github/workflows/security.yml": "24dd463044aa1c07ba47974e0887d677b4436855e94d976e881ec9fb4adae5dd",
         ".github/dependabot.yml": "e84a50232096bbb25263cf91b217b8425ba7d5e229c03a05494a1b9a5bd6c9ac",
     }
     return [

@@ -23,7 +23,7 @@ class SecurityWorkflowTests(unittest.TestCase):
             (".github/workflows/security.yml", "github.event_name == 'push' || github.event_name == 'schedule'", "github.event_name == 'pull_request' || github.event_name == 'push'"),
             (".github/workflows/security.yml", "runs-on: ubuntu-latest", "runs-on: [self-hosted, linux, public]"),
             (".github/workflows/security.yml", " && vars.DEPENDENCY_REVIEW_ENABLED == 'true'", ""),
-            (".github/workflows/security.yml", "@34e114876b0b11c390a56381ad16ebd13914f8d5", "@main"),
+            (".github/workflows/security.yml", "@11d5960a326750d5838078e36cf38b85af677262", "@main"),
             (".github/workflows/security.yml", "      contents: read", "      contents: read\n      actions: write"),
             (".github/workflows/security.yml", "  sbom:", "  sbom:\n    secrets: inherit"),
             (".github/workflows/security.yml", "          fail-on-severity: high", "          warn-only: true"),

@@ -43,6 +43,9 @@ github:
   flowGovernance: true
   autoMerge: true
   deleteBranchOnMerge: true
+  allowMergeCommit: false
+  allowSquashMerge: true
+  allowRebaseMerge: false
   requiredApprovals: 1
   requiredStatusChecks:
     - CI Gate
@@ -51,6 +54,22 @@ github:
     hasProjects: true
     hasWiki: false
     hasDiscussions: true
+environments:
+  stage:
+    reviewers:
+      - jmcte
+      - athena-omt
+    requireApproval: true
+    preventSelfReview: true
+    branches: []
+  prod:
+    reviewers:
+      - jmcte
+      - athena-omt
+    requireApproval: true
+    preventSelfReview: true
+    branches:
+      - main
 ci:
   codeqlSetup: default
   dependabot:

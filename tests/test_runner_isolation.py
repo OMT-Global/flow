@@ -23,7 +23,7 @@ class RunnerIsolationTests(unittest.TestCase):
             ('trusted-flow.yml', 'persist-credentials: false', 'persist-credentials: true'),
             ('trusted-flow.yml', 'runs-on: ubuntu-24.04', 'runs-on: [self-hosted, Linux, X64, shell-only]'),
             ('ci.yml', 'runs-on: ubuntu-latest', 'runs-on: [self-hosted, linux, public]'),
-            ('ci.yml', '@92199ad3b33c4c1d3d0d70e1d5839bc799715e35', '@main'),
+            ('ci.yml', '@2dc46ba506119c77f5efa614583833ae3ff7c74c', '@main'),
             ('ci.yml', 'permissions:\n      contents: read', 'secrets: inherit\n    permissions:\n      contents: read'),
         ]
         with tempfile.TemporaryDirectory() as tmp:
